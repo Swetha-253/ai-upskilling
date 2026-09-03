@@ -1,397 +1,161 @@
-# Week 3 Practical — Task Set E Results
+# Week 4 Practical — Task Set E Results: Debugging Retrieval — Hybrid, Reranking & Failure Separation
 
-## 1. 8 Known-Answer Questions & Known Locations
+**Domain**: Developer Documentation  
+**Module**: M2 — Retrieval & RAG  
+**Week**: 4 — Debugging Retrieval — Hybrid, Reranking & Failure Separation  
 
-| # | Question | Known-Correct Page & Section | Naive Chunker Top-5 | Structure-Aware Chunker Top-5 |
+---
+
+## 1. 12-Question Golden Set & Known Correct Locations
+
+The golden set is assembled from real developer queries on the SDK documentation, tagged with known-correct anchor chunk IDs. Out-of-corpus queries target un-documented operational parameters.
+
+| QID | Query Text | Category | Exact Token | Known-Correct Chunk ID |
 |---|---|---|---|---|
-| Q1 | What is the default value and type of retry_backoff_ms on Client.send()? | `docs/v3/client_send.md (## Parameters (retry_backoff_ms row))` | HIT (`v3_client_send_naive_0`) | HIT (`v3_client_send#clientsend-method-reference`) |
-| Q2 | Is idempotency_key required on Client.send(), and what is its data type? | `docs/v3/client_send.md (## Parameters (idempotency_key row))` | MISS (`v3_client_send_naive_4`) | HIT (`v3_client_send#code-example`) |
-| Q3 | What is the default value and type of max_batch_size on BatchProcessor.process()? | `docs/v3/batch_processor.md (## Parameters (max_batch_size row))` | HIT (`v3_batch_processor_naive_0`) | HIT (`v3_batch_processor#batchprocessorprocess-method-reference`) |
-| Q4 | What is the parameter name and default timeout value for establishing stream connections on StreamClient.connect()? | `docs/v3/stream_client.md (## Parameters (connection_timeout row))` | HIT (`v3_stream_client_naive_0`) | HIT (`v3_stream_client#streamclientconnect-method-reference`) |
-| Q5 | What header key name is passed for secret verification on Webhook.verify_signature(), and what is its default value? | `docs/v3/webhook_handler.md (## Parameters (signature_header row))` | HIT (`v3_webhook_handler_naive_2`) | HIT (`v3_webhook_handler#parameters`) |
-| Q6 | What is the return object type of Auth.login() and the default value of parameter token_ttl? | `docs/v3/auth_service.md (### Auth.login Method (Parameters & Response Format))` | MISS (`v3_auth_service_naive_3`) | HIT (`v3_auth_service#authlogin-method`) |
-| Q7 | What is the parameter name and data type used to enable gzip compression on Client.send()? | `docs/v3/client_send.md (## Parameters (enable_compression row))` | HIT (`v3_client_send_naive_3`) | HIT (`v3_client_send#parameters`) |
-| Q8 | What python code snippet demonstrates invoking Auth.refresh_token() to renew an expired session? | `docs/v3/auth_service.md (## Auth.refresh_token Method -> ### Code Example)` | HIT (`v3_auth_service_naive_4`) | HIT (`v3_auth_service#authrefresh_token-method`) |
-
-
-## 2. Chunking Strategy Performance Comparison
-
-| Chunking Strategy | Hit-in-Top-5 Score | Hit Percentage |
-|---|---|---|
-| Strategy 1: Naive Fixed-Window Chunker | **6/8** | 75% |
-| Strategy 2: Structure-Aware Markdown Chunker | **8/8** | **100%** |
-
-> [!NOTE]
-> **Hit Definition**: A retrieval is counted as a **HIT** if at least one chunk returned in the Top-5 contains the complete, unsevered factual evidence required to answer the question (including intact table headers with parameter rows and un-cut code fences).
-
-## 3. Search-Only Retrieval Dump (All 8 Questions under Both Strategies)
-
-### Question 1: What is the default value and type of retry_backoff_ms on Client.send()?
-**Known Location**: `docs/v3/client_send.md (## Parameters (retry_backoff_ms row))`
-
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 7.1946): `v3_client_send_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `# Client.send Method Reference  The `Client.send()` method submits a payload request to the SDK gateway asynchronously w...`
-- **Rank 2** (Score: 6.6363): `v3_client_send_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `SON data payload.  ## Code Example  ```python from sdk import Client  client = Client(api_key="sk_live_12345") response ...`
-- **Rank 3** (Score: 4.1776): `v3_client_send_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: ` enable_compression | bool | True | False | Enables gzip compression on request body payloads. |  ## Response Format  Re...`
-- **Rank 4** (Score: 3.9225): `v3_client_send_naive_1` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `e | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | payload | dict | N/A | True | The data o...`
-- **Rank 5** (Score: 3.6922): `v3_batch_processor_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `# BatchProcessor.process Method Reference  The `BatchProcessor.process()` method processes a list of item payloads in ba...`
-
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 5.3062): `v3_client_send#clientsend-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `# Client.send Method Reference  The `Client.send()` method submits a payload request to the SDK gateway asynchronously w...`
-- **Rank 2** (Score: 5.0183): `v3_client_send#code-example` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Code Example  ```python from sdk import Client  client = Client(api_key="sk_live_12345") response = client.send(     ...`
-- **Rank 3** (Score: 4.7325): `v3_client_send#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | payload | dict | N/A...`
-- **Rank 4** (Score: 3.8553): `v3_error_handler#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Response Format  Returns fallback result data or re-raises the original exception depending on configuration....`
-- **Rank 5** (Score: 3.4339): `v3_batch_processor#batchprocessorprocess-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `# BatchProcessor.process Method Reference  The `BatchProcessor.process()` method processes a list of item payloads in ba...`
+| **Q1** | What is the default value and type of retry_backoff_ms on Client.send()? | `exact_symbol` | `retry_backoff_ms` | `v3_client_send#parameters` |
+| **Q2** | Is idempotency_key required on Client.send(), and what is its default data type? | `exact_symbol` | `idempotency_key` | `v3_client_send#parameters` |
+| **Q3** | What is the default value and type of max_batch_size on BatchProcessor.process()? | `exact_symbol` | `max_batch_size` | `v3_batch_processor#parameters` |
+| **Q4** | What exception error code is raised when Webhook.verify_signature fails cryptographic verification? | `error_code` | `SignatureValidationError` | `v3_webhook_handler#response-format` |
+| **Q5** | What was the default retry backoff delay for Client.send in the v2 SDK legacy release? | `version_string` | `v2` | `v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend` |
+| **Q6** | What header key name is passed for secret signature verification on Webhook.verify_signature? | `exact_symbol` | `signature_header` | `v3_webhook_handler#parameters` |
+| **Q7** | What parameter name and default timeout value are used for establishing stream connections on StreamClient.connect()? | `exact_symbol` | `connection_timeout` | `v3_stream_client#parameters` |
+| **Q8** | What are the allowed string values for fallback_mode in ErrorHandler.handle? | `exact_symbol` | `fallback_mode` | `v3_error_handler#parameters` |
+| **Q9** | How do I authenticate user credentials and obtain an AuthToken with token_ttl in v3? | `semantic_query` | *None* | `v3_auth_service#authlogin-method` |
+| **Q10** | How do I refresh an expired session token using Auth.refresh_token in Python? | `semantic_query` | *None* | `v3_auth_service#authrefresh_token-method` |
+| **Q11** | What is the maximum HTTP request rate limit per minute allowed on the v3 SDK gateway endpoint? | `out_of_corpus` | *None* | *None (Not in corpus)* |
+| **Q12** | Which cloud server regions (e.g. us-east-1, eu-central-1) host the primary v3 SDK cluster? | `out_of_corpus` | *None* | *None (Not in corpus)* |
 
 ---
 
-### Question 2: Is idempotency_key required on Client.send(), and what is its data type?
-**Known Location**: `docs/v3/client_send.md (## Parameters (idempotency_key row))`
+## 2. Baseline Dense Retriever Performance & Inspection View Evidence
 
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 8.4555): `v3_client_send_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `SON data payload.  ## Code Example  ```python from sdk import Client  client = Client(api_key="sk_live_12345") response ...`
-- **Rank 2** (Score: 6.9905): `v3_client_send_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `# Client.send Method Reference  The `Client.send()` method submits a payload request to the SDK gateway asynchronously w...`
-- **Rank 3** (Score: 5.0912): `v3_client_send_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: ` enable_compression | bool | True | False | Enables gzip compression on request body payloads. |  ## Response Format  Re...`
-- **Rank 4** (Score: 4.0243): `v3_error_handler_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `st ("raise", "ignore", or "cached"). |  ## Response Format  Returns fallback result data or re-raises the original excep...`
-- **Rank 5** (Score: 3.3511): `v3_client_send_naive_5` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `s=500,     idempotency_key="req_unique_99",     enable_compression=True ) print(response.status_code) ``` ...`
+**Baseline Hit-Rate@3**: **4 / 12 (33.3%)**  
+**Baseline p50 Latency**: **0.884 ms** per query  
 
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 5.7505): `v3_client_send#code-example` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Code Example  ```python from sdk import Client  client = Client(api_key="sk_live_12345") response = client.send(     ...`
-- **Rank 2** (Score: 5.6798): `v3_client_send#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | payload | dict | N/A...`
-- **Rank 3** (Score: 4.6285): `v3_error_handler#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Response Format  Returns fallback result data or re-raises the original exception depending on configuration....`
-- **Rank 4** (Score: 4.3602): `v3_client_send#clientsend-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `# Client.send Method Reference  The `Client.send()` method submits a payload request to the SDK gateway asynchronously w...`
-- **Rank 5** (Score: 2.6176): `v3_client_send#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Response Format  Returns a `Response` object containing the HTTP status code and parsed JSON data payload....`
+### Inspection View Failure Diagnosis (All 8 Misses)
 
----
-
-### Question 3: What is the default value and type of max_batch_size on BatchProcessor.process()?
-**Known Location**: `docs/v3/batch_processor.md (## Parameters (max_batch_size row))`
-
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 10.6461): `v3_batch_processor_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `# BatchProcessor.process Method Reference  The `BatchProcessor.process()` method processes a list of item payloads in ba...`
-- **Rank 2** (Score: 8.6642): `v3_batch_processor_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `r traces.  ## Code Example  ```python from sdk import BatchProcessor  processor = BatchProcessor(api_key="sk_live_12345"...`
-- **Rank 3** (Score: 7.4922): `v3_batch_processor_naive_1` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: ` Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | items | list | N/A | T...`
-- **Rank 4** (Score: 4.1776): `v3_client_send_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: ` enable_compression | bool | True | False | Enables gzip compression on request body payloads. |  ## Response Format  Re...`
-- **Rank 5** (Score: 3.095): `v3_error_handler_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `st ("raise", "ignore", or "cached"). |  ## Response Format  Returns fallback result data or re-raises the original excep...`
-
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 9.9988): `v3_batch_processor#batchprocessorprocess-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `# BatchProcessor.process Method Reference  The `BatchProcessor.process()` method processes a list of item payloads in ba...`
-- **Rank 2** (Score: 7.4144): `v3_batch_processor#code-example` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `## Code Example  ```python from sdk import BatchProcessor  processor = BatchProcessor(api_key="sk_live_12345") results =...`
-- **Rank 3** (Score: 6.5254): `v3_batch_processor#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | items | list | N/A |...`
-- **Rank 4** (Score: 3.8553): `v3_error_handler#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Response Format  Returns fallback result data or re-raises the original exception depending on configuration....`
-- **Rank 5** (Score: 3.481): `v3_client_send#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | payload | dict | N/A...`
+1. **Q1 Failure (Label: R)**
+   - *Retrieved Top-3*: `['v2_client_send#clientsend-method-reference-v2-sdk-legacy', 'v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend', 'v2_client_send#code-example']`
+   - *Evidence*: Dense cosine vector similarity matched general retry prose in v2/v3 overview guides, failing to retrieve parameter table `v3_client_send#parameters` containing exact token `retry_backoff_ms` into the top-3 window.
+2. **Q2 Failure (Label: R)**
+   - *Retrieved Top-3*: `['v2_client_send#code-example', 'v3_client_send#code-example', 'v2_client_send#clientsend-method-reference-v2-sdk-legacy']`
+   - *Evidence*: Dense embeddings mapped exact symbol `idempotency_key` to generic client send code snippets, omitting target parameter table `v3_client_send#parameters` (ranked #6+).
+3. **Q4 Failure (Label: R)**
+   - *Retrieved Top-3*: `['v3_webhook_handler#webhookverify_signature-method-reference', 'v3_webhook_handler#code-example', 'v3_error_handler#parameters']`
+   - *Evidence*: Dense search retrieved general webhook method headers and error parameters, placing exact exception token chunk `v3_webhook_handler#response-format` at rank 5.
+4. **Q6 Failure (Label: R)**
+   - *Retrieved Top-3*: `['v3_webhook_handler#code-example', 'v3_webhook_handler#webhookverify_signature-method-reference', 'v3_webhook_handler#response-format']`
+   - *Evidence*: Dense embedding search placed target parameter table `v3_webhook_handler#parameters` at rank 4, just outside the top-3 window.
+5. **Q7 Failure (Label: R)**
+   - *Retrieved Top-3*: `['v3_stream_client#streamclientconnect-method-reference', 'v3_stream_client#code-example', 'v2_client_send#parameters']`
+   - *Evidence*: Dense vector search ranked stream overview and code example ahead of target table `v3_stream_client#parameters` (ranked #4).
+6. **Q8 Failure (Label: R)**
+   - *Retrieved Top-3*: `['v3_error_handler#errorhandlerhandle-method-reference', 'v3_error_handler#code-example', 'v3_webhook_handler#parameters']`
+   - *Evidence*: Dense retriever mapped query to general error handler overview and code snippet, pushing `v3_error_handler#parameters` down to rank 5.
+7. **Q11 Failure (Label: Not-In-Corpus)**
+   - *Retrieved Top-3*: `['v3_client_send#clientsend-method-reference', 'v3_client_send#parameters', 'v3_webhook_handler#parameters']`
+   - *Evidence*: Question asks for gateway rate limits per minute, which is not documented anywhere in the corpus markdown files.
+8. **Q12 Failure (Label: Not-In-Corpus)**
+   - *Retrieved Top-3*: `['v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend', 'v3_stream_client#streamclientconnect-method-reference', 'v2_client_send#parameters']`
+   - *Evidence*: Question asks for cloud hosting server regions, which are absent from the v2/v3 SDK reference docs.
 
 ---
 
-### Question 4: What is the parameter name and default timeout value for establishing stream connections on StreamClient.connect()?
-**Known Location**: `docs/v3/stream_client.md (## Parameters (connection_timeout row))`
+## 3. Failure Separation Tally
 
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 11.3049): `v3_stream_client_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: `# StreamClient.connect Method Reference  The `StreamClient.connect()` method establishes a persistent WebSocket connecti...`
-- **Rank 2** (Score: 8.5224): `v3_stream_client_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: ` to event streams.  ## Code Example  ```python from sdk import StreamClient  client = StreamClient(api_key="sk_live_1234...`
-- **Rank 3** (Score: 5.2835): `v3_stream_client_naive_5` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: `/events",     connection_timeout=30.0,     heartbeat_interval=15 ) as stream:     for event in stream.listen():         ...`
-- **Rank 4** (Score: 4.1776): `v3_client_send_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: ` enable_compression | bool | True | False | Enables gzip compression on request body payloads. |  ## Response Format  Re...`
-- **Rank 5** (Score: 3.57): `v3_stream_client_naive_1` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: `Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | endpoint_url | str | N/A | True | The...`
-
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 10.6169): `v3_stream_client#streamclientconnect-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: `# StreamClient.connect Method Reference  The `StreamClient.connect()` method establishes a persistent WebSocket connecti...`
-- **Rank 2** (Score: 9.8796): `v3_stream_client#code-example` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: `## Code Example  ```python from sdk import StreamClient  client = StreamClient(api_key="sk_live_12345") with client.conn...`
-- **Rank 3** (Score: 4.8045): `v3_stream_client#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | endpoint_url | str |...`
-- **Rank 4** (Score: 3.8553): `v3_error_handler#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Response Format  Returns fallback result data or re-raises the original exception depending on configuration....`
-- **Rank 5** (Score: 3.481): `v3_client_send#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | payload | dict | N/A...`
+| Failure Category | Description | Count | Percentage of Failures |
+|---|---|---|---|
+| **R** | Retrieval fetched bad context (target chunk not in top-3) | **6** | **75.0%** |
+| **G** | Model misused good context (target chunk present but generator failed) | **0** | **0.0%** |
+| **Not-In-Corpus** | Fact is absent from documentation corpus | **2** | **25.0%** |
+| **Total Failures** | Sum of all non-HIT queries | **8** | **100.0%** |
 
 ---
 
-### Question 5: What header key name is passed for secret verification on Webhook.verify_signature(), and what is its default value?
-**Known Location**: `docs/v3/webhook_handler.md (## Parameters (signature_header row))`
+## 4. Single Retrieval Change Justification
 
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 10.7858): `v3_webhook_handler_naive_2` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `ure-256" | True | Header name containing the HMAC-SHA256 signature hash. | | secret_key | str | N/A | True | Shared secr...`
-- **Rank 2** (Score: 9.8989): `v3_webhook_handler_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `# Webhook.verify_signature Method Reference  The `Webhook.verify_signature()` method validates cryptographic signature h...`
-- **Rank 3** (Score: 6.9658): `v3_webhook_handler_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `ationError`.  ## Code Example  ```python from sdk import Webhook  is_valid = Webhook.verify_signature(     raw_body=b'{"...`
-- **Rank 4** (Score: 4.3198): `v3_webhook_handler_naive_1` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | raw_body | bytes | N/A | True | U...`
-- **Rank 5** (Score: 3.6826): `v3_client_send_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: ` enable_compression | bool | True | False | Enables gzip compression on request body payloads. |  ## Response Format  Re...`
-
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 8.8497): `v3_webhook_handler#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | raw_body | bytes | N...`
-- **Rank 2** (Score: 8.2118): `v3_webhook_handler#webhookverify_signature-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `# Webhook.verify_signature Method Reference  The `Webhook.verify_signature()` method validates cryptographic signature h...`
-- **Rank 3** (Score: 5.9982): `v3_webhook_handler#code-example` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `## Code Example  ```python from sdk import Webhook  is_valid = Webhook.verify_signature(     raw_body=b'{"event":"user.c...`
-- **Rank 4** (Score: 3.9221): `v3_webhook_handler#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/webhook_handler.md`
-  > *Snippet*: `## Response Format  Returns a boolean `True` if signature verification succeeds, or raises `SignatureValidationError`....`
-- **Rank 5** (Score: 3.0549): `v3_error_handler#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Response Format  Returns fallback result data or re-raises the original exception depending on configuration....`
+> **Justification**:  
+> The failure inspection tally demonstrates that 100% of answerable misses (6 out of 6) are **R-type retrieval failures** caused by dense vector embedding limitations on exact alphanumeric tokens (symbol names like `retry_backoff_ms`, `idempotency_key`, `signature_header`, `connection_timeout`, `fallback_mode`, and error codes like `SignatureValidationError`). Dense embedding models project text into smooth semantic vector spaces, which structurally homogenize distinct symbol names into broad topic clusters (e.g. grouping parameter tables with generic retry prose or code examples). Consequently, the team lead's suggestion to "swap the embedding model for a denser one" is fundamentally flawed — a denser semantic space cannot solve exact-string keyword matching. We selected **BM25 + RRF (Reciprocal Rank Fusion, k=60)** as our single retrieval change. BM25 directly indexes exact tokens lexically, and RRF rank fusion combines exact keyword precision with dense semantic recall without scale mismatch errors, directly addressing the root cause identified in the tally.
 
 ---
 
-### Question 6: What is the return object type of Auth.login() and the default value of parameter token_ttl?
-**Known Location**: `docs/v3/auth_service.md (### Auth.login Method (Parameters & Response Format))`
+## 5. Before vs. After Performance & Latency Benchmark
 
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 9.6662): `v3_auth_service_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `g `access_token` and `expires_in`.  ### Code Example  ```python from sdk import Auth  auth = Auth() token_info = auth.lo...`
-- **Rank 2** (Score: 8.9731): `v3_auth_service_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `# Auth API Reference  The `Auth` service handles user authentication, session token issuance, and token renewal.  ## Aut...`
-- **Rank 3** (Score: 6.1198): `v3_batch_processor_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `ncy | int | 4 | False | Number of parallel worker threads handling batches. |  ## Response Format  Returns a `BatchResul...`
-- **Rank 4** (Score: 5.8561): `v3_auth_service_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `    token_ttl=3600 ) print("Access token:", token_info.access_token) ```  ## Auth.refresh_token Method  Refreshes an exi...`
-- **Rank 5** (Score: 5.7541): `v3_batch_processor_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `# BatchProcessor.process Method Reference  The `BatchProcessor.process()` method processes a list of item payloads in ba...`
+Exactly **ONE variable** was changed between runs: switching `Retriever` mode from `dense` to `hybrid` (BM25 + Dense RRF Fusion, $k=60$).
 
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 11.542): `v3_auth_service#authlogin-method` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `## Auth.login Method  Authenticates credentials and issues access tokens.  ### Parameters  | Name | Type | Default | Req...`
-- **Rank 2** (Score: 6.0475): `v3_auth_service#auth-api-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `# Auth API Reference  The `Auth` service handles user authentication, session token issuance, and token renewal....`
-- **Rank 3** (Score: 5.9456): `v3_batch_processor#batchprocessorprocess-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `# BatchProcessor.process Method Reference  The `BatchProcessor.process()` method processes a list of item payloads in ba...`
-- **Rank 4** (Score: 5.6505): `v3_batch_processor#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/batch_processor.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | items | list | N/A |...`
-- **Rank 5** (Score: 4.4639): `v3_client_send#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Response Format  Returns a `Response` object containing the HTTP status code and parsed JSON data payload....`
+| Metric | Baseline (Dense Only) | Single Change (Hybrid RRF, $k=60$) | Delta / Impact |
+|---|---|---|---|
+| **Hit-Rate@3 (All 12)** | **33.3%** (4/12) | **41.7%** (5/12) | **+8.4%** (+1 query fixed) |
+| **Hit-Rate@3 (In-Corpus 10)** | **40.0%** (4/10) | **50.0%** (5/10) | **+10.0%** |
+| **p50 Query Latency** | **0.884 ms** | **1.155 ms** | **+0.271 ms** (+30.6% latency price) |
 
 ---
 
-### Question 7: What is the parameter name and data type used to enable gzip compression on Client.send()?
-**Known Location**: `docs/v3/client_send.md (## Parameters (enable_compression row))`
+## 6. Per-Question Failure & Fix Tracking Record
 
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 11.6701): `v3_client_send_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: ` enable_compression | bool | True | False | Enables gzip compression on request body payloads. |  ## Response Format  Re...`
-- **Rank 2** (Score: 7.6009): `v3_client_send_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `# Client.send Method Reference  The `Client.send()` method submits a payload request to the SDK gateway asynchronously w...`
-- **Rank 3** (Score: 6.0369): `v3_client_send_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `SON data payload.  ## Code Example  ```python from sdk import Client  client = Client(api_key="sk_live_12345") response ...`
-- **Rank 4** (Score: 4.5278): `v3_error_handler_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `st ("raise", "ignore", or "cached"). |  ## Response Format  Returns fallback result data or re-raises the original excep...`
-- **Rank 5** (Score: 3.6448): `v3_stream_client_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-  > *Snippet*: `# StreamClient.connect Method Reference  The `StreamClient.connect()` method establishes a persistent WebSocket connecti...`
-
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 9.0783): `v3_client_send#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | payload | dict | N/A...`
-- **Rank 2** (Score: 5.4289): `v3_error_handler#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Response Format  Returns fallback result data or re-raises the original exception depending on configuration....`
-- **Rank 3** (Score: 5.3868): `v3_client_send#clientsend-method-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `# Client.send Method Reference  The `Client.send()` method submits a payload request to the SDK gateway asynchronously w...`
-- **Rank 4** (Score: 3.4035): `v3_client_send#response-format` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Response Format  Returns a `Response` object containing the HTTP status code and parsed JSON data payload....`
-- **Rank 5** (Score: 3.2106): `v3_client_send#code-example` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-  > *Snippet*: `## Code Example  ```python from sdk import Client  client = Client(api_key="sk_live_12345") response = client.send(     ...`
+| QID | Target Chunk ID | Baseline (Dense) | Single Change (Hybrid RRF) | Status | Analysis & Fixed / Unfixed Reason |
+|---|---|---|---|---|---|
+| **Q1** | `v3_client_send#parameters` | MISS (R, #6+) | MISS (R, #6+) | **UNFIXED** | Exact token `retry_backoff_ms` appears in both v2 and v3 pages; term frequency repetition across v2 prose causes BM25 to rank v2 legacy retry chunks ahead of v3 parameters. |
+| **Q2** | `v3_client_send#parameters` | MISS (R, #6+) | MISS (R, #4) | **UNFIXED** | BM25 ranked target #1 lexically, but Dense ranked it #8. RRF rank sum ($1/61 + 1/68 = 0.0311$) left target at Rank 4, just missing Top-3. |
+| **Q3** | `v3_batch_processor#parameters` | HIT (Rank 2) | HIT (Rank 2) | **PRESERVED** | Target parameter table preserved at Rank 2. |
+| **Q4** | `v3_webhook_handler#response-format` | MISS (R, #5) | MISS (R, #5) | **UNFIXED** | Exception token chunk ranked #5 as method reference and error parameter chunks share keyword terms. |
+| **Q5** | `v2_client_send#overview-of-default...` | HIT (Rank 1) | HIT (Rank 1) | **PRESERVED** | Preserved exact target chunk at Rank 1. |
+| **Q6** | `v3_webhook_handler#parameters` | MISS (R, #4) | HIT (Rank 3) | **FIXED** | **FIXED!** BM25 boosted `v3_webhook_handler#parameters` to Rank 1 lexically; RRF rank fusion pulled it from Rank 4 to Rank 3 into the Top-3 window. |
+| **Q7** | `v3_stream_client#parameters` | MISS (R, #4) | MISS (R, #4) | **UNFIXED** | Stream code example and method reference chunks rank higher due to heavy term overlap. |
+| **Q8** | `v3_error_handler#parameters` | MISS (R, #5) | MISS (R, #5) | **UNFIXED** | Error handler method reference and code example outrank parameter table. |
+| **Q9** | `v3_auth_service#authlogin-method` | HIT (Rank 1) | HIT (Rank 1) | **PRESERVED** | Preserved target semantic chunk at Rank 1. |
+| **Q10** | `v3_auth_service#authrefresh_token-method` | HIT (Rank 1) | HIT (Rank 1) | **PRESERVED** | Preserved target semantic chunk at Rank 1. |
+| **Q11** | *None (Not in corpus)* | MISS (Not-In-Corpus) | MISS (Not-In-Corpus) | **NOT IN CORPUS** | Correctly missing target chunk (out-of-corpus rate limit query). |
+| **Q12** | *None (Not in corpus)* | MISS (Not-In-Corpus) | MISS (Not-In-Corpus) | **NOT IN CORPUS** | Correctly missing target chunk (out-of-corpus cloud region query). |
 
 ---
 
-### Question 8: What python code snippet demonstrates invoking Auth.refresh_token() to renew an expired session?
-**Known Location**: `docs/v3/auth_service.md (## Auth.refresh_token Method -> ### Code Example)`
+## 7. Shipping Decision with Quantitative Evidence
 
-#### Strategy 1: Naive Fixed-Window Chunker (Top-5 Dump)
-- **Rank 1** (Score: 13.9669): `v3_auth_service_naive_4` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `    token_ttl=3600 ) print("Access token:", token_info.access_token) ```  ## Auth.refresh_token Method  Refreshes an exi...`
-- **Rank 2** (Score: 8.3696): `v3_auth_service_naive_6` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `urns a refreshed `AuthToken` instance.  ### Code Example  ```python new_token = auth.refresh_token(refresh_token="ref_ab...`
-- **Rank 3** (Score: 6.0815): `v3_auth_service_naive_0` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `# Auth API Reference  The `Auth` service handles user authentication, session token issuance, and token renewal.  ## Aut...`
-- **Rank 4** (Score: 5.8373): `v3_auth_service_naive_3` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `g `access_token` and `expires_in`.  ### Code Example  ```python from sdk import Auth  auth = Auth() token_info = auth.lo...`
-- **Rank 5** (Score: 3.5539): `v3_error_handler_naive_2` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `. | | max_retries | int | 3 | False | Maximum retry attempts to execute before invoking error fallback handlers. | | fal...`
-
-#### Strategy 2: Structure-Aware Markdown Chunker (Top-5 Dump)
-- **Rank 1** (Score: 14.2478): `v3_auth_service#authrefresh_token-method` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `## Auth.refresh_token Method  Refreshes an existing expired session token.  ### Parameters  | Name | Type | Default | Re...`
-- **Rank 2** (Score: 6.4094): `v3_auth_service#auth-api-reference` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `# Auth API Reference  The `Auth` service handles user authentication, session token issuance, and token renewal....`
-- **Rank 3** (Score: 5.1425): `v3_auth_service#authlogin-method` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/auth_service.md`
-  > *Snippet*: `## Auth.login Method  Authenticates credentials and issues access tokens.  ### Parameters  | Name | Type | Default | Req...`
-- **Rank 4** (Score: 2.9819): `v3_error_handler#parameters` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Parameters  | Name | Type | Default | Required | Description | | --- | --- | --- | --- | --- | | exception | Exceptio...`
-- **Rank 5** (Score: 1.5281): `v3_error_handler#code-example` — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/error_handler.md`
-  > *Snippet*: `## Code Example  ```python from sdk import ErrorHandler  try:     # operation     pass except Exception as err:     res ...`
+> **DECISION**: **SHIP Hybrid RRF (k=60).**  
+> **Quantitative Proof**:  
+> 1. **Hit-Rate Gain**: Hybrid RRF improves hit-rate@3 from **33.3% (4/12)** to **41.7% (5/12)**, successfully converting Q6 (`signature_header`) from an R-failure to a Top-3 HIT while preserving 100% of existing baseline hits.  
+> 2. **Latency Trade-Off**: The p50 query latency increases by **0.271 ms** (from 0.884 ms to 1.155 ms). For an interactive developer documentation assistant, a total retrieval latency under 1.2 ms is well within the 50 ms real-time user budget. The +8.4 percentage point accuracy improvement far outweighs the nominal 0.27 ms latency cost.
 
 ---
 
+## 8. Bonus Challenge: MMR Diversification Analysis
 
+### Problem Description
+In developer docs, queries asking about common API operations (such as retry backoff on `Client.send()`) return top results that are identical methods documented across multiple SDK major versions (`v2` vs `v3`).
 
-## 4. Metadata Filter Bug & Demonstration
+### Benchmark Results with MMR ($\lambda = 0.7$, Candidate Window = 15)
 
-### Query
-`"What is the default retry backoff delay when sending client requests with Client.send()?"`
+- **MMR Hit-Rate@3**: **58.3% (7/12)**  
+- **Top-3 Diversity (Average Unique Source Files)**: **2.00 / 3** (up from 1.33 / 3 in standard RRF)  
 
-### Unfiltered Results (Demonstrating Bug where v2 outranks v3)
-- **Rank 1** (Score: 20.4454): `v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend` (Version: `v2`) — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v2/client_send.md`
-- **Rank 2** (Score: 13.3379): `v2_client_send#clientsend-method-reference-v2-sdk-legacy` (Version: `v2`) — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v2/client_send.md`
-- **Rank 3** (Score: 9.9519): `v2_client_send#parameters` (Version: `v2`) — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v2/client_send.md`
+### Shipping Recommendation on MMR
+> **RECOMMENDATION**: **DO NOT SHIP MMR BY DEFAULT WITHOUT VERSION METADATA FILTERING.**  
+> While MMR increases hit-rate@3 on an unfiltered multi-version corpus by penalizing redundant section chunks, it introduces a critical hazard: **MMR can intentionally demote active v3 documentation out of the Top-3 to force legacy v2 pages into the context window for visual variety**. In developer documentation RAG, users asking about the active SDK require version-accurate precision, not version diversity. The correct solution for multi-version document crowding is **metadata filtering (`sdk_version == "v3"`)**, not unconstrained MMR diversification.
 
-> [!WARNING]
-> **Bug Diagnosis**: Without metadata filtering, the v2 legacy page (`docs/v2/client_send.md`) outranks the v3 reference page because the v2 page repeats key terms like "retry_backoff_ms" and "default retry backoff delay" multiple times in legacy prose, inflating BM25 term frequency scores.
+---
 
-### Filtered Results (`sdk_version == "v3"`)
-- **Rank 1** (Score: 9.4779): `v3_client_send#clientsend-method-reference` (Version: `v3`) — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-- **Rank 2** (Score: 5.1128): `v3_client_send#code-example` (Version: `v3`) — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/client_send.md`
-- **Rank 3** (Score: 4.6106): `v3_stream_client#code-example` (Version: `v3`) — File: `/Users/softsuaves/Desktop/AI-Upskilling/ai-upskilling/data/docs/v3/stream_client.md`
-
-> [!NOTE]
-> **Fix Verification**: Applying the metadata filter `sdk_version == "v3"` strictly excludes legacy v2 chunks, successfully restoring the v3 reference chunk `v3_client_send#parameters` as the Top-1 result.
-
-## 5. Cited Answers for Answerable Questions (3 Transcripts)
-
-### Answer 1
-**Query**: What is the default value and type of retry_backoff_ms on Client.send()?  
-**Generated Answer**: On `Client.send()`, the `retry_backoff_ms` parameter has a default value of **500** and its data type is **int** [v3_client_send#code-example].  
-**Citation**: `[v3_client_send#code-example]` (Resolves to Page: `v3_client_send`, Anchor: `#parameters`)  
-**Chunk Verification**: Verified — chunk `v3_client_send#clientsend-method-reference` contains the exact supporting claim.
-
-### Answer 2
-**Query**: Is idempotency_key required on Client.send(), and what is its data type?  
-**Generated Answer**: The `idempotency_key` parameter on `Client.send()` has type **str**, a default value of **None**, and is **not required** (Required: False) [v3_client_send#code-example].  
-**Citation**: `[v3_client_send#code-example]` (Resolves to Page: `v3_client_send`, Anchor: `#parameters`)  
-**Chunk Verification**: Verified — chunk `v3_client_send#code-example` contains the exact supporting claim.
-
-### Answer 3
-**Query**: What is the default value and type of max_batch_size on BatchProcessor.process()?  
-**Generated Answer**: The `max_batch_size` parameter on `BatchProcessor.process()` has a default value of **100** and is of type **int** [v3_batch_processor#code-example].  
-**Citation**: `[v3_batch_processor#code-example]` (Resolves to Page: `v3_batch_processor`, Anchor: `#parameters`)  
-**Chunk Verification**: Verified — chunk `v3_batch_processor#batchprocessorprocess-method-reference` contains the exact supporting claim.
-
-
-
-## 6. Forced Refusal Transcripts for Out-of-Corpus Questions (3 Transcripts)
-
-### Refusal Transcript 1
-**Query**: What is the maximum HTTP request rate limit per minute allowed on the v3 SDK gateway endpoint?  
-**Verbatim Output**: `I cannot answer this question based on the provided documentation.`  
-**Status**: Forced Refusal Executed (No hallucination).
-
-### Refusal Transcript 2
-**Query**: Which cloud server regions (e.g. us-east-1, eu-central-1) host the primary v3 SDK cluster?  
-**Verbatim Output**: `I cannot answer this question based on the provided documentation.`  
-**Status**: Forced Refusal Executed (No hallucination).
-
-### Refusal Transcript 3
-**Query**: What is the pricing tier cost per month for high-throughput batch processing?  
-**Verbatim Output**: `I cannot answer this question based on the provided documentation.`  
-**Status**: Forced Refusal Executed (No hallucination).
-
-
-
-## 7. Defended Chunking Strategy & Embarrassing Retrieval Analysis
-
-### Ship Decision
-**We ship Strategy 2: Structure-Aware Markdown Chunker.**
-Structure-aware chunking achieved an **8/8 (100%)** top-5 hit rate compared to **6/8 (75%)** for naive fixed-window chunking. By aligning chunk boundaries with markdown headers (`#`, `##`, `###`), tables, and code blocks, structure-aware chunking prevents parameter definitions from being severed from their table headers and prevents code blocks from being cut mid-syntax. This guarantees that retrieved context retains full semantic integrity for LLM answer synthesis.
-
-### Documented Embarrassing Retrieval & Diagnosis
-During naive chunking execution on Question 8 (*"What python code snippet demonstrates invoking Auth.refresh_token() to renew an expired session?"*), the retriever returned chunk `v3_auth_service_naive_5`. Because the naive chunker split content strictly every 220 characters without inspecting code block syntax, the fenced python code block was sliced directly in half:
-```python
-# Sliced into Chunk 5:
-token_ttl=3600
-)
-print("Access token:", token_info.access_token)
-```
-```python
-# Sliced into Chunk 6:
-new_token = auth.refresh_token(refresh_token="ref_abc123xyz")
-print("Refreshed token expiry:", new_token.expires_in)
-```
-When queried, Chunk 5 retrieved as the top result with a score of 13.116, but only contained orphaned code arguments from `Auth.login()`, while the actual invocation code for `Auth.refresh_token()` was severed into Chunk 6. This embarrassed the retriever by delivering syntactically broken, misleading code fragments to the user.
-
-## 8. Bonus Challenge: Precision vs. Completeness Tension
-
-### Bonus Query
-`"How do you pass the idempotency_key parameter when calling Client.send() in Python code?"`
-
-### Side-by-Side Answer Comparison
-
-| Chunker Strategy | Generated Answer | Trade-off Analysis |
-|---|---|---|
-| **Structure-Aware (Tight Parameter Table Chunk)** | The `idempotency_key` parameter is defined as type `str` with default value `None` and required `False` [v3_client_send#parameters]. (Note: The tight parameter table chunk does not contain a Python code example showing invocation syntax). | **Retrieval Win, Generation Loss**: Retrieves the exact parameter definition with high precision score, but fails to show code syntax because the code block resides in a separate section chunk. |
-| **Broad Context / Full Section Chunk** | In Python, pass `idempotency_key` as a keyword argument to `client.send()`: 
-```python
-response = client.send(
-    payload={"query": "analytics"},
-    idempotency_key="req_unique_99"
-)
-``` [v3_client_send#code-example] | **Retrieval Loss, Generation Win**: Slightly lower keyword precision score due to broader chunk length, but successfully provides the Python code block demonstrating syntax invocation. |
-
-### Tension Analysis (Two Sentences)
-Tight structure-aware chunking maximizes retrieval precision by isolating parameter definitions, but risks breaking semantic context between API specifications and their usage code blocks. In contrast, broader chunks preserve completeness by keeping code examples alongside parameter tables, ensuring the LLM receives the full context necessary to synthesize complete code answers despite slightly lower retrieval density.
-
-## 9. Code Diff: Naive vs. Structure-Aware Chunker
+## 9. Code Diff Showing Single Retrieval Change
 
 ```diff
---- src/chunkers.py (Naive Chunker)
-+++ src/chunkers.py (Structure-Aware Chunker)
-@@ -14,28 +14,54 @@
--class NaiveChunker:
--    def chunk_document(self, doc: Document) -> List[Chunk]:
--        # Fixed character window slicing ignoring markdown boundaries
--        start = 0
--        while start < len(content):
--            chunk_text = content[start:start+220]
--            start += 190
-+class StructureAwareChunker:
-+    def chunk_document(self, doc: Document) -> List[Chunk]:
-+        # Header-aware splitting preserving tables and code blocks
-+        for line in lines:
-+            header_match = re.match(r"^(#{1,3})\s+(.*)$", line)
-+            if header_match and not in_code_block:
-+                save_section(current_section_title, section_lines)
-+                current_section_title = header_match.group(2)
+--- src/retriever.py (Baseline Dense Mode)
++++ src/retriever.py (Single Change: Hybrid RRF Mode)
+@@ -22,4 +22,4 @@
+ class Retriever:
+-    def __init__(self, chunks: List[Chunk], mode: str = "dense"):
++    def __init__(self, chunks: List[Chunk], mode: str = "hybrid"):
+         self.chunks = chunks
+-        self.mode = mode  # "dense", "bm25", or "hybrid"
++        self.mode = mode  # "hybrid" (BM25 + Dense RRF Fusion with k=60)
 ```
 
-## 10. Submission Checklist
+---
 
-- [x] `results.md` with all 8 questions and their known-correct page + section
-- [x] The two hit-in-top-5 numbers (**6/8** and **8/8**) in one table
-- [x] Unfiltered vs filtered result lists for one `sdk_version` query, with scores
-- [x] 3 cited answers + 3 refusal transcripts pasted verbatim
-- [x] Code diff showing the second chunker and the metadata fields
-- [x] One paragraph: which chunker ships, and why
+## 10. Submission Checklist Verification
+
+- [x] `golden_set.jsonl`: 12 real developer questions, each tagged with its known-correct `chunk_id`
+- [x] Baseline Hit-Rate@3 (**33.3%**) measured and written down before changes
+- [x] R / G / Not-In-Corpus failure tally with 1 line of empirical evidence per miss
+- [x] Before -> After Hit-Rate@3 (**33.3% -> 41.7%**) and p50 Latency (**0.884 ms -> 1.155 ms**) in one table
+- [x] Per-question fixed / unfixed / preserved tracking table
+- [x] Code diff showing exactly ONE retrieval change (`mode="hybrid"`)
