@@ -98,7 +98,7 @@ def run_judge_v2(case: dict) -> tuple:
 
 def main():
     print("=" * 80)
-    print("WEEK 6 PRACTICAL — TASK SET E: EVALUATION ENGINE")
+    print("WEEK 7 PRACTICAL — TASK SET E: EVALUATION ENGINE")
     print("=" * 80)
 
     # Load eval set & blind labels
