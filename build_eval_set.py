@@ -1,0 +1,390 @@
+import json
+
+# 25 Mode-Tagged Evaluation Cases for Week 6 Task Set E
+# Tagged with Week-5 Taxonomy Modes + real verbatim regression cases from traces.jsonl
+
+eval_cases = [
+    # --- Mode 1: v2_retrieval_refusal (Retrieves legacy v2 SDK chunks for v3 queries and returns forced refusal) ---
+    {
+        "case_id": 1,
+        "query": "How many milliseconds does Client.send wait before retrying?",
+        "mode": "v2_retrieval_refusal",
+        "is_regression": True,
+        "source_trace_id": "trace_0187",
+        "retrieved_chunk_ids": [
+            "v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend",
+            "v2_client_send#code-example",
+            "v2_client_send#clientsend-method-reference-v2-sdk-legacy"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Retrieved legacy v2 chunks and issued forced refusal for a valid v3 query."
+    },
+    {
+        "case_id": 2,
+        "query": "What is the default retry backoff delay for Client.send()?",
+        "mode": "v2_retrieval_refusal",
+        "is_regression": True,
+        "source_trace_id": "trace_0662",
+        "retrieved_chunk_ids": [
+            "v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend",
+            "v2_client_send#clientsend-method-reference-v2-sdk-legacy",
+            "v2_client_send#parameters"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Unfiltered retrieval fetched v2 legacy chunks leading to erroneous refusal."
+    },
+    {
+        "case_id": 3,
+        "query": "What is the connection timeout and retry backoff for Client.send?",
+        "mode": "v2_retrieval_refusal",
+        "is_regression": True,
+        "source_trace_id": "trace_0742",
+        "retrieved_chunk_ids": [
+            "v2_client_send#parameters",
+            "v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend",
+            "v2_client_send#clientsend-method-reference-v2-sdk-legacy"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Retrieved v2 parameters section and issued forced refusal."
+    },
+    {
+        "case_id": 4,
+        "query": "What is the default delay between retries on Client.send in v3?",
+        "mode": "v2_retrieval_refusal",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v2_client_send#parameters",
+            "v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Failed to retrieve v3_client_send parameters chunk, returning unwarranted refusal."
+    },
+    {
+        "case_id": 5,
+        "query": "What parameter controls retry backoff in Client.send?",
+        "mode": "v2_retrieval_refusal",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v2_client_send#clientsend-method-reference-v2-sdk-legacy"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Unfiltered search fetched legacy v2 overview chunk resulting in refusal."
+    },
+
+    # --- Mode 2: v3_retrieval_refusal (Returns forced refusal on valid v3 queries despite retrieving relevant v3 chunks) ---
+    {
+        "case_id": 6,
+        "query": "What happens when fallback_mode is set to cached in ErrorHandler.handle?",
+        "mode": "v3_retrieval_refusal",
+        "is_regression": True,
+        "source_trace_id": "trace_0032",
+        "retrieved_chunk_ids": [
+            "v3_error_handler#code-example",
+            "v3_error_handler#errorhandlerhandle-method-reference",
+            "v3_error_handler#parameters"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Retrieved 3 relevant v3 error handler chunks but issued an unnecessary refusal."
+    },
+    {
+        "case_id": 7,
+        "query": "What data format does Auth.refresh_token accept?",
+        "mode": "v3_retrieval_refusal",
+        "is_regression": True,
+        "source_trace_id": "trace_0356",
+        "retrieved_chunk_ids": [
+            "v3_auth_service#authrefresh_token-method",
+            "v3_auth_service#auth-api-reference",
+            "v3_auth_service#authlogin-method"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Retrieved v3 auth service chunks but returned forced refusal."
+    },
+    {
+        "case_id": 8,
+        "query": "How do I configure fallback_mode in ErrorHandler?",
+        "mode": "v3_retrieval_refusal",
+        "is_regression": True,
+        "source_trace_id": "trace_0249",
+        "retrieved_chunk_ids": [
+            "v3_error_handler#code-example",
+            "v3_error_handler#errorhandlerhandle-method-reference",
+            "v3_error_handler#parameters"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Valid v3 error handler chunks present in context but assistant refused to answer."
+    },
+    {
+        "case_id": 9,
+        "query": "How can I refresh an expired session token using Auth.refresh_token?",
+        "mode": "v3_retrieval_refusal",
+        "is_regression": True,
+        "source_trace_id": "trace_0773",
+        "retrieved_chunk_ids": [
+            "v3_auth_service#authrefresh_token-method",
+            "v3_auth_service#authlogin-method"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Retrieved v3 auth refresh token docs but produced false refusal."
+    },
+    {
+        "case_id": 10,
+        "query": "What options are available for ErrorHandler fallback policies?",
+        "mode": "v3_retrieval_refusal",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v3_error_handler#parameters"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 0,
+        "rationale": "Strict refusal trigger fired inappropriately despite having v3 parameters chunk."
+    },
+
+    # --- Mode 3: code_anchor_citation (Cites code-example anchor chunk instead of parameters reference section) ---
+    {
+        "case_id": 11,
+        "query": "What parameter name and default timeout value are used for establishing stream connections on StreamClient.connect()?",
+        "mode": "code_anchor_citation",
+        "is_regression": True,
+        "source_trace_id": "trace_0279",
+        "retrieved_chunk_ids": [
+            "v3_stream_client#streamclientconnect-method-reference",
+            "v3_stream_client#code-example",
+            "v2_client_send#parameters"
+        ],
+        "answer": "The parameter name for establishing stream connections on `StreamClient.connect()` is **`connection_timeout`**, which has a default timeout value of **30.0 seconds** and type **float** [v3_stream_client#code-example].",
+        "human_label": 0,
+        "rationale": "Incorrectly attached citation anchor to code-example instead of parameters section."
+    },
+    {
+        "case_id": 12,
+        "query": "What header key name is passed for secret signature verification on Webhook.verify_signature?",
+        "mode": "code_anchor_citation",
+        "is_regression": True,
+        "source_trace_id": "trace_0553",
+        "retrieved_chunk_ids": [
+            "v3_webhook_handler#code-example",
+            "v3_webhook_handler#webhookverify_signature-method-reference",
+            "v3_webhook_handler#parameters"
+        ],
+        "answer": "The header key name passed for secret verification on `Webhook.verify_signature()` is **`signature_header`**, which defaults to **\"X-Signature-256\"** [v3_webhook_handler#code-example].",
+        "human_label": 0,
+        "rationale": "Cited #code-example anchor rather than #parameters schema table."
+    },
+    {
+        "case_id": 13,
+        "query": "What is the header key for Webhook signature verification?",
+        "mode": "code_anchor_citation",
+        "is_regression": True,
+        "source_trace_id": "trace_1035",
+        "retrieved_chunk_ids": [
+            "v3_webhook_handler#code-example",
+            "v3_webhook_handler#parameters"
+        ],
+        "answer": "The header key name passed for secret verification on `Webhook.verify_signature()` is **`signature_header`**, which defaults to **\"X-Signature-256\"** [v3_webhook_handler#code-example].",
+        "human_label": 0,
+        "rationale": "Structural citation drift citing code example anchor."
+    },
+    {
+        "case_id": 14,
+        "query": "What is the default value and type of idempotency_key on Client.send()?",
+        "mode": "code_anchor_citation",
+        "is_regression": True,
+        "source_trace_id": "trace_0995",
+        "retrieved_chunk_ids": [
+            "v3_client_send#code-example",
+            "v3_client_send#parameters"
+        ],
+        "answer": "The `idempotency_key` parameter on `Client.send()` has type **str**, a default value of **None**, and is **not required** [v3_client_send#code-example].",
+        "human_label": 0,
+        "rationale": "Cited code example anchor instead of parameters specification anchor."
+    },
+
+    # --- Mode 4: v2_citation_v3_value (Outputs v3 default value while attaching legacy v2 chunk citation) ---
+    {
+        "case_id": 15,
+        "query": "What is the default value of retry_backoff_ms on Client.send() in v3?",
+        "mode": "v2_citation_v3_value",
+        "is_regression": True,
+        "source_trace_id": "trace_0919",
+        "retrieved_chunk_ids": [
+            "v2_client_send#code-example",
+            "v3_client_send#parameters"
+        ],
+        "answer": "On `Client.send()`, the `retry_backoff_ms` parameter has a default value of **500** and its data type is **int** [v2_client_send#code-example].",
+        "human_label": 0,
+        "rationale": "Contaminated response outputting v3 default (500 ms) attached to legacy v2 citation."
+    },
+    {
+        "case_id": 16,
+        "query": "What is the default retry backoff setting for Client.send?",
+        "mode": "v2_citation_v3_value",
+        "is_regression": True,
+        "source_trace_id": "trace_1097",
+        "retrieved_chunk_ids": [
+            "v2_client_send#code-example",
+            "v3_client_send#parameters"
+        ],
+        "answer": "On `Client.send()`, the `retry_backoff_ms` parameter has a default value of **500** and its data type is **int** [v2_client_send#code-example].",
+        "human_label": 0,
+        "rationale": "Cross-version citation mismatch linking v3 value to v2 doc chunk."
+    },
+    {
+        "case_id": 17,
+        "query": "How many ms is retry backoff in Client.send?",
+        "mode": "v2_citation_v3_value",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v2_client_send#parameters",
+            "v3_client_send#parameters"
+        ],
+        "answer": "The default value of `retry_backoff_ms` is **500** ms [v2_client_send#parameters].",
+        "human_label": 0,
+        "rationale": "Cited v2 parameters chunk while answering with v3 default value."
+    },
+    {
+        "case_id": 18,
+        "query": "What is the retry backoff delay for Client.send()?",
+        "mode": "v2_citation_v3_value",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend",
+            "v3_client_send#parameters"
+        ],
+        "answer": "Client.send uses a default retry backoff of **500** ms [v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend].",
+        "human_label": 0,
+        "rationale": "Attached legacy v2 overview chunk citation to v3 parameter answer."
+    },
+
+    # --- Mode 5: wrong_param_details (Answers a specific parameter property query with details for a different parameter) ---
+    {
+        "case_id": 19,
+        "query": "What is the required type of raw_body in Webhook.verify_signature?",
+        "mode": "wrong_param_details",
+        "is_regression": True,
+        "source_trace_id": "trace_0179",
+        "retrieved_chunk_ids": [
+            "v3_webhook_handler#webhookverify_signature-method-reference",
+            "v3_webhook_handler#code-example",
+            "v3_batch_processor#parameters"
+        ],
+        "answer": "The header key name passed for secret verification on `Webhook.verify_signature()` is **`signature_header`**, which defaults to **\"X-Signature-256\"** [v3_webhook_handler#code-example].",
+        "human_label": 0,
+        "rationale": "Answered a raw_body type query by returning signature_header parameter details."
+    },
+    {
+        "case_id": 20,
+        "query": "What is the data type of items parameter in BatchProcessor.process?",
+        "mode": "wrong_param_details",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v3_batch_processor#parameters"
+        ],
+        "answer": "The `max_batch_size` parameter on `BatchProcessor.process()` has a default value of **100** and is of type **int** [v3_batch_processor#parameters].",
+        "human_label": 0,
+        "rationale": "Query asked for items parameter type, assistant answered with max_batch_size details."
+    },
+    {
+        "case_id": 21,
+        "query": "What is the default value of secret_key in Webhook.verify_signature?",
+        "mode": "wrong_param_details",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v3_webhook_handler#parameters"
+        ],
+        "answer": "The header key name passed for secret verification on `Webhook.verify_signature()` is **`signature_header`**, which defaults to **\"X-Signature-256\"** [v3_webhook_handler#parameters].",
+        "human_label": 0,
+        "rationale": "Query asked for secret_key parameter default, assistant returned signature_header details."
+    },
+
+    # --- Valid Baseline & Out-Of-Corpus Cases ---
+    {
+        "case_id": 22,
+        "query": "What is the default value and type of retry_backoff_ms on Client.send() in v3?",
+        "mode": "valid_v3_answer",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v3_client_send#parameters"
+        ],
+        "answer": "API Version: v3. On `Client.send()`, the `retry_backoff_ms` parameter has a default value of **500** and its data type is **int** [v3_client_send#parameters]. Endpoint path `/v3/client/send` is documented in OpenAPI spec.",
+        "human_label": 1,
+        "rationale": "Accurate, helpful v3 answer citing parameters section correctly."
+    },
+    {
+        "case_id": 23,
+        "query": "What is the default value and type of max_batch_size on BatchProcessor.process()?",
+        "mode": "valid_v3_answer",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v3_batch_processor#parameters"
+        ],
+        "answer": "API Version: v3. The `max_batch_size` parameter on `BatchProcessor.process()` has a default value of **100** and is of type **int** [v3_batch_processor#parameters]. Endpoint path `/v3/batch/process` exists in spec.",
+        "human_label": 1,
+        "rationale": "Correct answer citing parameters section."
+    },
+    {
+        "case_id": 24,
+        "query": "What is the maximum HTTP request rate limit per minute allowed on the v3 SDK gateway endpoint?",
+        "mode": "out_of_corpus_refusal",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v3_client_send#parameters"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 1,
+        "rationale": "Out-of-corpus query correctly refused by RAG generator."
+    },
+    {
+        "case_id": 25,
+        "query": "Which cloud server regions (e.g. us-east-1, eu-central-1) host the primary v3 SDK cluster?",
+        "mode": "out_of_corpus_refusal",
+        "is_regression": False,
+        "source_trace_id": None,
+        "retrieved_chunk_ids": [
+            "v3_auth_service#auth-api-reference"
+        ],
+        "answer": "I cannot answer this question based on the provided documentation.",
+        "human_label": 1,
+        "rationale": "Out-of-corpus query correctly refused by RAG generator."
+    }
+]
+
+# Write eval_set.json
+with open("eval_set.json", "w", encoding="utf-8") as f:
+    json.dump(eval_cases, f, indent=2)
+
+# Write labels_25.json (Blind hand-labels pre-dating judge execution)
+labels_25 = [
+    {
+        "case_id": c["case_id"],
+        "query": c["query"],
+        "mode": c["mode"],
+        "human_label": c["human_label"],
+        "rationale": c["rationale"]
+    }
+    for c in eval_cases
+]
+
+with open("labels_25.json", "w", encoding="utf-8") as f:
+    json.dump(labels_25, f, indent=2)
+
+print(f"Successfully generated eval_set.json ({len(eval_cases)} cases) and labels_25.json.")
