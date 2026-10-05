@@ -1,0 +1,13 @@
+--- config/mcp_config_s1.json	2026-10-05 11:32:56
++++ config/mcp_config_s2.json	2026-10-05 11:33:11
+@@ -3,6 +3,10 @@
+     "docs_search": {
+       "command": ".venv/bin/python",
+       "args": ["mcp_servers/docs_server.py"]
++    },
++    "package_registry": {
++      "command": ".venv/bin/python",
++      "args": ["mcp_servers/package_registry_server.py"]
+     }
+   }
+ }

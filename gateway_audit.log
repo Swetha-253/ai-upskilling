@@ -1,0 +1,3 @@
+[AUDIT LOG] timestamp=2026-10-05T11:42:18Z caller=DocsAgent tool=get_package_deprecation_notice target=docs-sdk@2.1.0 scope=read:all status=ALLOWED
+[AUDIT LOG] timestamp=2026-10-05T11:42:18Z caller=DocsAgent tool=get_package_deprecation_notice target=docs-sdk@2.1.0 scope=read:versions_only status=DENIED_SCOPE
+[AUDIT LOG] timestamp=2026-10-05T11:42:18Z caller=DocsAgent tool=get_package_versions target=docs-sdk@latest scope=read:versions_only status=ALLOWED
