@@ -1,0 +1,188 @@
+{
+  "statement": "Model call location: The LLM model call happens in the client agent AFTER tools/list responses are received and BEFORE crafting the tools/call request; no LLM call happens inside the MCP server.",
+  "annotations_guide": {
+    "jsonrpc": "JSON-RPC specification version identifier (always '2.0').",
+    "id": "Unique request/response sequence identifier matching client requests to server responses.",
+    "method": "The JSON-RPC endpoint/capability being invoked (e.g., 'initialize', 'tools/list', 'tools/call').",
+    "params": "Input parameters payload carrying client capabilities, tool names, or tool execution arguments.",
+    "result": "Server payload container returning protocol version, discovered tool schemas, or execution output."
+  },
+  "exchange": [
+    {
+      "step": "1_initialize_request",
+      "direction": "client -> server",
+      "_comment_jsonrpc": "JSON-RPC version (2.0)",
+      "_comment_id": "Message correlation ID (1)",
+      "_comment_method": "MCP initialization handshake method",
+      "_comment_params": "Negotiated protocol version and client metadata",
+      "raw_json": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {
+          "protocolVersion": "2024-11-05",
+          "capabilities": {},
+          "clientInfo": {
+            "name": "DocsAgentClient",
+            "version": "1.0.0"
+          }
+        }
+      }
+    },
+    {
+      "step": "1_initialize_response",
+      "direction": "server -> client",
+      "_comment_jsonrpc": "JSON-RPC version (2.0)",
+      "_comment_id": "Matches request correlation ID (1)",
+      "_comment_result": "Server protocol version, server capabilities, and package-registry server metadata",
+      "raw_json": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "protocolVersion": "2024-11-05",
+          "capabilities": {
+            "tools": {}
+          },
+          "serverInfo": {
+            "name": "package-registry-server",
+            "version": "1.0.0"
+          }
+        }
+      }
+    },
+    {
+      "step": "2_initialized_notification",
+      "direction": "client -> server",
+      "_comment_jsonrpc": "JSON-RPC version (2.0)",
+      "_comment_method": "Notification acknowledging server readiness (no response expected)",
+      "raw_json": {
+        "jsonrpc": "2.0",
+        "method": "notifications/initialized"
+      }
+    },
+    {
+      "step": "3_tools_list_request",
+      "direction": "client -> server",
+      "_comment_jsonrpc": "JSON-RPC version (2.0)",
+      "_comment_id": "Message correlation ID (2)",
+      "_comment_method": "Dynamic tool discovery request",
+      "raw_json": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "tools/list"
+      }
+    },
+    {
+      "step": "3_tools_list_response",
+      "direction": "server -> client",
+      "_comment_jsonrpc": "JSON-RPC version (2.0)",
+      "_comment_id": "Matches request correlation ID (2)",
+      "_comment_result": "List of discovered MCP tools (get_package_versions, get_release_date, get_package_deprecation_notice) with JSON Schema input specs",
+      "raw_json": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "tools": [
+            {
+              "name": "get_package_versions",
+              "description": "Query package registry for all published version metadata, latest release tag, and available release history for a given package name.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "package_name": {
+                    "type": "string",
+                    "description": "Package name (e.g. docs-sdk)"
+                  }
+                },
+                "required": [
+                  "package_name"
+                ]
+              }
+            },
+            {
+              "name": "get_release_date",
+              "description": "Query package registry to retrieve the exact release timestamp/date for a specific package name and version tag.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "package_name": {
+                    "type": "string",
+                    "description": "Package name (e.g. docs-sdk)"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Target version string (e.g. 3.2.0)"
+                  }
+                },
+                "required": [
+                  "package_name",
+                  "version"
+                ]
+              }
+            },
+            {
+              "name": "get_package_deprecation_notice",
+              "description": "Query package registry for deprecation notices, end-of-life sunset warnings, and migration upgrade advice for a specific package version.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "package_name": {
+                    "type": "string",
+                    "description": "Package name (e.g. docs-sdk)"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Version string to check (e.g. 2.1.0 or v2)"
+                  }
+                },
+                "required": [
+                  "package_name",
+                  "version"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": "4_tools_call_request",
+      "direction": "client -> server",
+      "_comment_jsonrpc": "JSON-RPC version (2.0)",
+      "_comment_id": "Message correlation ID (3)",
+      "_comment_method": "Tool execution request",
+      "_comment_params": "Tool name ('get_package_deprecation_notice') and target arguments ({package_name: 'docs-sdk', version: '2.1.0'})",
+      "raw_json": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "tools/call",
+        "params": {
+          "name": "get_package_deprecation_notice",
+          "arguments": {
+            "package_name": "docs-sdk",
+            "version": "2.1.0"
+          }
+        }
+      }
+    },
+    {
+      "step": "4_tools_call_response",
+      "direction": "server -> client",
+      "_comment_jsonrpc": "JSON-RPC version (2.0)",
+      "_comment_id": "Matches request correlation ID (3)",
+      "_comment_result": "Tool execution content array containing structured JSON response with deprecation notice",
+      "raw_json": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\n  \"tool\": \"get_package_deprecation_notice\",\n  \"package_name\": \"docs-sdk\",\n  \"version\": \"2.1.0\",\n  \"is_deprecated\": true,\n  \"deprecation_notice\": \"Version 2.1.0 is deprecated as of 2026-06-01. Migrate to v3.2.0 before mandatory sunset date.\",\n  \"recommended_upgrade\": \"3.2.0\"\n}"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
