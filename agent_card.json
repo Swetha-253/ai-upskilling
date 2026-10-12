@@ -1,0 +1,97 @@
+{
+  "agentCardVersion": "1.0.0",
+  "name": "docs-migration-orchestrator",
+  "description": "Multi-Agent Orchestrator managing SDK version verification, deprecation tracking, and OpenAPI code sample synthesis.",
+  "capabilities": [
+    {
+      "id": "verify_version_lifecycle",
+      "description": "Query deprecation registry and verify symbol breaking changes between v2 and v3.",
+      "delegated_to": "version_worker"
+    },
+    {
+      "id": "synthesize_code_sample",
+      "description": "Extract OpenAPI 3.0 schema and synthesize runnable syntax-valid Python code snippets.",
+      "delegated_to": "code_sample_worker"
+    }
+  ],
+  "interfaces": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Natural language developer migration query"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Target method or parameter symbol"
+        },
+        "target_version": {
+          "type": "string",
+          "enum": [
+            "v2",
+            "v3"
+          ],
+          "default": "v3"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string",
+          "description": "Grounded answer with markdown code sample"
+        },
+        "verified_version": {
+          "type": "string"
+        },
+        "deprecation_status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "deprecated",
+            "unverified"
+          ]
+        },
+        "degradation_mode": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "answer",
+        "degradation_mode"
+      ]
+    }
+  },
+  "authentication": {
+    "type": "BearerToken / mTLS",
+    "required_scopes": [
+      "docs:read",
+      "registry:deprecations:query",
+      "openapi:spec:inspect"
+    ]
+  },
+  "a2a_task_lifecycle": {
+    "states": [
+      "SUBMITTED",
+      "WORKING",
+      "PAUSED: input-required",
+      "COMPLETED",
+      "FAILED"
+    ],
+    "failure_500_mapping": {
+      "trigger": "VersionDeprecationWorker returns HTTP 500 after 2 retries",
+      "state_transition": "WORKING -> PAUSED: input-required",
+      "pause_reason": "Upstream deprecation registry service unavailable. Waiting for caller to specify explicit target SDK version before generating unverified code sample.",
+      "fallback_transition": "If caller timeout occurs (30s) -> COMPLETED (with graceful degradation warning)"
+    },
+    "protocol_value_summary": [
+      "1. Formal A2A protocols provide first-class asynchronous state machines (e.g. PAUSED: input-required for human disambiguation) and mutual capability discovery.",
+      "2. Standard REST calls treat worker drops as opaque 500 errors, lacking standardized context propagation, task resumption semantics, and distributed tracing contracts."
+    ]
+  }
+}
