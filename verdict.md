@@ -1,5 +1,9 @@
-## Verdict: Agent vs. Workflow Decision
-
-Across all 10 documentation migration benchmark questions, the fixed 3-step workflow achieved an identical 100.0% pass rate as the hand-built agent loop while reducing p50 latency by 74.3% (0.0001s vs 0.0001s), lowering total token consumption by 61.3% (5097 vs 22170 tokens), and cutting cost per question from $0.003326 to $0.000764.
-
-Applying the core decision rule ('does the execution path vary dynamically based on runtime input?'), none of the 10 questions forced an agent loop. Even dependent questions (such as checking endpoint deprecation before lookup) followed a deterministic three-step pattern (doc search -> spec fetch -> deprecation lookup). Therefore, the fixed workflow wins unequivocally across all four metrics, proving an agent loop adds unnecessary cost, latency, and debug complexity.
+## Architecture Verdict: KILL Multi-Agent Squad
+1. **Decision**: **KILL** the Multi-Agent Squad in production; retain the Single Agent.
+2. **Zero Quality Advantage**: Both arms achieved an identical **100.0% Pass Rate** under the Evaluator Model.
+3. **Token Explosion**: The Multi-Agent Squad triggered a **3.2x Context Re-Send Multiplier** (24200 vs. 7540 tokens).
+4. **Latency Delay**: Inter-agent IPC hand-offs increased p50 latency by **+833%** (2.8 ms vs. 0.3 ms).
+5. **Cost Inflation**: Cost per question surged **3.2x** ($0.003630 vs. $0.001131) with zero incremental accuracy.
+6. **Re-Send Bottleneck**: Orchestrator-to-worker context re-sending alone devoured **41.1%** of all squad tokens.
+7. **Failure Multiplier**: Isolated worker HTTP 500 errors introduced distributed failure cascades and retry complexity.
+8. **Sunk-Cost Bias Rejection**: We explicitly reject the sunk-cost fallacy of preserving multi-agent code simply because we invested time building specialized workers and hand-off protocols; complexity without performance gain is pure technical debt.

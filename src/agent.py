@@ -314,6 +314,8 @@ class DocsAgent:
             "argument_validity_rate": argument_validity_rate,
             "step_efficiency": step_efficiency,
             "answer": final_answer,
+            "prompt_injection_detected": prompt_injection_detected,
+            "prompt_injection_neutralized": prompt_injection_neutralized,
             "discovered_tool_count": len(self.discovered_tools),
             "discovered_tool_names": sorted(list(self.discovered_tools.keys()))
         }

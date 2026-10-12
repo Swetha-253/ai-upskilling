@@ -1,0 +1,150 @@
+# Agent-to-Agent Delegation & Context Re-Send Handoffs Log
+# Generated: 2026-10-12 19:39:22
+# Total Multi-Agent Tokens: 24200 | Single Agent Tokens: 7540
+# Context Re-Send Multiplier: 3.2x
+# Largest Bottleneck: Orchestrator -> Code-Sample Worker Resend (41.1% of total tokens)
+
+================================================================================
+DETAILED PER-HOP AUDIT TRAIL
+================================================================================
+
+=== [QUESTION Q1: How do I authenticate and obtain an access token in the v3 SDK?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'Auth.login'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/auth/login' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/auth/login
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0029s | Cost: $0.003630
+
+=== [QUESTION Q2: What is the default value of retry_backoff_ms in v3 Client.send?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'Client.send'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/client/send' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/client/send
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0029s | Cost: $0.003630
+
+=== [QUESTION Q3: How do I configure gzip request compression in v3 Client.send?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'Client.send'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/client/send' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/client/send
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0028s | Cost: $0.003630
+
+=== [QUESTION Q4: What is the connection heartbeat parameter in v3 StreamClient?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'StreamClient.connect'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/stream/connect' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/stream/connect
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0028s | Cost: $0.003630
+
+=== [QUESTION Q5: How are errors handled in v3 SDK batch processing?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'BatchProcessor.process'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/batch/process' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/batch/process
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0029s | Cost: $0.003630
+
+=== [QUESTION Q6: How do I verify incoming webhooks in v3 SDK?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'WebhookHandler.verify'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/webhook/verify' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/webhook/verify
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0028s | Cost: $0.003630
+
+=== [QUESTION Q7: What parameter replaced old_ttl in v3 Auth.login?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'old_ttl'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/auth/login' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/auth/login
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0028s | Cost: $0.003630
+
+=== [QUESTION Q8: Migrate code using v2 request_body on Client.send to v3. Is request_body supported in v3?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'request_body'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/client/send' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/client/send
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0028s | Cost: $0.003630
+
+=== [QUESTION Q9: Check if /v2/legacy/batch endpoint works in v3. If deprecated, what is the new endpoint spec and usage?] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol '/v2/legacy/batch'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v2/legacy/batch' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v2/legacy/batch
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0028s | Cost: $0.003630
+
+=== [QUESTION Q10: Migrate v2 auth login code using old_token_renew method to v3.] ===
+[2026-10-12 19:39:22] [HOP 1] ORCHESTRATOR -> VERSION_WORKER | Action: delegate_version_deprecation_check | Status: success_200 | Hop Tokens: 365 | Cumulative: 365
+  Summary: Check deprecation & version for symbol 'old_token_renew'
+[2026-10-12 19:39:22] [HOP 2] VERSION_WORKER -> ORCHESTRATOR | Action: return_version_findings | Status: success_200 | Hop Tokens: 150 | Cumulative: 515
+  Summary: Version status: is_deprecated=False
+[2026-10-12 19:39:22] [HOP 3] ORCHESTRATOR -> CODE_SAMPLE_WORKER | Action: context_resend_and_code_generation | Status: success_200 | Hop Tokens: 995 | Cumulative: 1510
+  Summary: Context Re-Send: query + version report + endpoint '/v3/auth/login' spec
+[2026-10-12 19:39:22] [HOP 4] CODE_SAMPLE_WORKER -> ORCHESTRATOR | Action: return_code_sample | Status: success_200 | Hop Tokens: 270 | Cumulative: 1780
+  Summary: Generated code snippet for endpoint /v3/auth/login
+[2026-10-12 19:39:22] [HOP 5] ORCHESTRATOR -> USER | Action: synthesize_final_answer | Status: success_200 | Hop Tokens: 640 | Cumulative: 2420
+  Summary: Synthesize aggregate answer from version & code workers
+  --> Question Total Tokens: 2420 | Latency: 0.0028s | Cost: $0.003630
+
+================================================================================
+DELEGATION BOTTLENECK ANALYSIS SUMMARY:
+- Total Multi-Agent System Tokens: 24200
+- Total Single Agent Baseline Tokens: 7540
+- Context Re-Send Multiplier (Multi/Single): 3.2x (exact: 3.21x)
+- Hop 1 (Orchestrator -> Version Worker)     : 3650 tokens (15.1%)
+- Hop 2 (Version Worker -> Orchestrator)     : 1500 tokens (6.2%)
+- Hop 3 (Orchestrator -> Code Worker Resend) : 9950 tokens (41.1% - DOMINANT BOTTLENECK)
+- Hop 4 (Code Worker -> Orchestrator)        : 2700 tokens (11.2%)
+- Hop 5 (Orchestrator Final Synthesis)       : 6400 tokens (26.4%)
