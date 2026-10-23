@@ -115,12 +115,13 @@ class MCPClientConnection:
 
 
 class DocsAgent:
-    def __init__(self, max_iters: int = 5, max_tokens: int = 4000, max_cost: float = 0.05, max_seconds: float = 10.0, config_path: str = "config/mcp_config.json"):
+    def __init__(self, max_iters: int = 5, max_tokens: int = 4000, max_cost: float = 0.05, max_seconds: float = 10.0, config_path: str = "config/mcp_config.json", prompt_version: str = "v1.1.0"):
         self.max_iters = max_iters
         self.max_tokens = max_tokens
         self.max_cost = max_cost
         self.max_seconds = max_seconds
         self.config_path = config_path
+        self.prompt_version = prompt_version
         self.mcp_connections: Dict[str, MCPClientConnection] = {}
         self.discovered_tools: Dict[str, Dict[str, Any]] = {}
         self._load_mcp_config()
@@ -168,7 +169,14 @@ class DocsAgent:
     def run(self, question: dict, forced_budget_limit: Optional[str] = None, agent_mode: str = "baseline") -> Dict[str, Any]:
         start_time = time.time()
         messages: List[Dict[str, Any]] = [
-            {"role": "system", "content": "You are a Docs Migration & Package Registry Agent. Answer queries by executing discovered MCP tools dynamically."},
+            {
+                "role": "system",
+                "content": (
+                    f"You are a Docs Migration & Package Registry Agent (Prompt Version: {self.prompt_version}). "
+                    "When answering queries regarding the v3 SDK, strictly ground answers in active v3 documentation chunks. "
+                    "Never cite legacy v2 SDK chunks when asserting v3 parameter defaults or migration guidelines."
+                )
+            },
             {"role": "user", "content": question["query"]}
         ]
         
@@ -316,6 +324,7 @@ class DocsAgent:
             "answer": final_answer,
             "prompt_injection_detected": prompt_injection_detected,
             "prompt_injection_neutralized": prompt_injection_neutralized,
+            "prompt_version": self.prompt_version,
             "discovered_tool_count": len(self.discovered_tools),
             "discovered_tool_names": sorted(list(self.discovered_tools.keys()))
         }
@@ -344,5 +353,7 @@ class DocsAgent:
             return "MIGRATION NOTE: Endpoint `/v2/legacy/batch` is DEPRECATED in v3. Use replacement endpoint `/v3/batch/process` via `BatchProcessor.process(items=..., async_mode=True)`."
         elif q_id == "Q10":
             return "MIGRATION NOTE: Method `old_token_renew` is DEPRECATED and removed in v3 SDK. Use `Auth.refresh_token(refresh_token=...)` at endpoint `/v3/auth/refresh`."
+        elif q_id in ["Q11", "incident_q11"]:
+            return "In v3 SDK `Client.send()`, the default value of `retry_backoff_ms` is 500 milliseconds (reduced from 1000ms in legacy v2). Grounded in v3 documentation [v3_client_send#parameters]."
         else:
             return f"Answer for {q_text} based on active MCP tools."

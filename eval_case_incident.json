@@ -1,0 +1,26 @@
+{
+  "id": "Q11",
+  "incident_trace_id": "trace_0919",
+  "category": "cross_version_citation_isolation",
+  "query": "What default retry_backoff_ms value is used in Client.send? Ensure response references v3 documentation only.",
+  "search_term": "Client.send retry_backoff_ms",
+  "endpoint": "/v3/client/send",
+  "symbol": "Client.send",
+  "target_api_version": "v3",
+  "expected_keywords": [
+    "500",
+    "milliseconds",
+    "v3",
+    "Client.send"
+  ],
+  "forbidden_keywords": [
+    "v2_client_send",
+    "1000ms in v2"
+  ],
+  "required_citation_chunk": "v3_client_send#parameters",
+  "forbidden_citation_prefixes": [
+    "v2_"
+  ],
+  "is_dependent": false,
+  "rationale": "Converted from customer incident trace_0919 where unfiltered retrieval pulled legacy v2 documentation chunks and the model outputted v3 default (500ms) with a contaminated v2 citation. Test enforces strict v3 grounding and zero cross-version citation contamination."
+}
