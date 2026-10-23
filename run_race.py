@@ -106,6 +106,17 @@ BENCHMARK_QUESTIONS = [
     }
 ]
 
+# Permanent Customer Incident Eval Case (Week 11 Failure-to-Test Loop)
+INCIDENT_CASE_FILE = os.path.join(os.path.dirname(__file__), "eval_case_incident.json")
+if os.path.exists(INCIDENT_CASE_FILE):
+    try:
+        with open(INCIDENT_CASE_FILE, "r", encoding="utf-8") as _f:
+            _inc_case = json.load(_f)
+            if not any(q["id"] == _inc_case["id"] for q in BENCHMARK_QUESTIONS):
+                BENCHMARK_QUESTIONS.append(_inc_case)
+    except Exception:
+        pass
+
 def run_race():
     print("=" * 80)
     print("WEEK 7 PRACTICAL — TASK SET E: DOCS AGENT VS FIXED WORKFLOW RACE")

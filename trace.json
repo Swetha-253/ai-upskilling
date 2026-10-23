@@ -1,0 +1,107 @@
+{
+  "trace_id": "trace_0919",
+  "timestamp": "2025-09-04T23:12:50Z",
+  "user_id": "dev_170",
+  "prompt_version": "v1.0.0",
+  "model": "gemini-3.5-flash",
+  "parameters": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "max_output_tokens": 1024
+  },
+  "query": "What default retry_backoff_ms value is used in Client.send?",
+  "output": "On `Client.send()`, the `retry_backoff_ms` parameter has a default value of **500** and its data type is **int** [v2_client_send#code-example].",
+  "refused": false,
+  "citations": [
+    {
+      "chunk_id": "v2_client_send#code-example",
+      "page_id": "v2_client_send",
+      "anchor": "parameters"
+    }
+  ],
+  "totals": {
+    "total_latency_ms": 441.2,
+    "total_tokens": 832,
+    "total_cost_usd": 0.001248,
+    "status": "incident_silent_regression"
+  },
+  "spans": [
+    {
+      "span_id": "span_01_retrieval",
+      "name": "retrieval_stage",
+      "stage": "Retrieval",
+      "latency_ms": 18.6,
+      "token_count": 0,
+      "cost_usd": 0.0,
+      "metadata_filter_applied": null,
+      "retrieved_chunk_ids": [
+        "v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend",
+        "v2_client_send#code-example",
+        "v2_client_send#clientsend-method-reference-v2-sdk-legacy"
+      ],
+      "retrieved_chunks_preview": [
+        {
+          "chunk_id": "v2_client_send#overview-of-default-retry-backoff-delay-in-clientsend",
+          "content_snippet": "In v2 SDK, the default retry backoff delay when sending client requests with Client.send() was 1000 milliseconds. Note that in v3 SDK this default was changed to 500 milliseconds."
+        },
+        {
+          "chunk_id": "v2_client_send#code-example",
+          "content_snippet": "from sdk_v2 import Client\nclient = Client()\nclient.send(request_body={\"data\": \"test\"}, retry_backoff_ms=1000)"
+        },
+        {
+          "chunk_id": "v2_client_send#clientsend-method-reference-v2-sdk-legacy",
+          "content_snippet": "| retry_backoff_ms | int | 1000 | False | Default retry backoff delay milliseconds for Client.send retry requests in v2 SDK. |"
+        }
+      ],
+      "retrieval_status": "contaminated_v2_leakage"
+    },
+    {
+      "span_id": "span_02_tool_execution",
+      "name": "tool_execution_stage",
+      "stage": "Tool Executions",
+      "latency_ms": 2.1,
+      "input_tokens": 110,
+      "output_tokens": 70,
+      "token_count": 180,
+      "cost_usd": 0.000270,
+      "tool_invocations": [
+        {
+          "tool_name": "search_docs",
+          "args": {
+            "query": "Client.send retry_backoff_ms",
+            "api_version": "unspecified"
+          },
+          "status": "success_200",
+          "latency_ms": 2.1
+        }
+      ]
+    },
+    {
+      "span_id": "span_03_generation",
+      "name": "llm_generation_stage",
+      "stage": "Generation",
+      "prompt_version": "v1.0.0",
+      "latency_ms": 420.5,
+      "input_tokens": 580,
+      "output_tokens": 72,
+      "token_count": 652,
+      "cost_usd": 0.000978,
+      "system_prompt_version": "v1.0.0",
+      "system_prompt_snippet": "Answer ONLY using the provided context chunks. If the context does not contain enough information, state: 'I cannot answer this question based on the provided documentation.'",
+      "raw_output": "On `Client.send()`, the `retry_backoff_ms` parameter has a default value of **500** and its data type is **int** [v2_client_send#code-example].",
+      "citations": [
+        {
+          "chunk_id": "v2_client_send#code-example",
+          "page_id": "v2_client_send",
+          "anchor": "parameters"
+        }
+      ],
+      "refused": false
+    }
+  ],
+  "root_cause_analysis": {
+    "retrieval_verdict": "PULLED OUTDATED DOCS: The retrieval pipeline executed without metadata version filtering (filters=None). The hybrid BM25 / RRF token ranker retrieved obsolete v2 SDK chunks (v2_client_send) instead of v3 SDK chunks (v3_client_send).",
+    "generation_verdict": "PARAMETRIC MEMORY RECALL / CITATION MISALIGNMENT: In the retrieved v2 chunk (v2_client_send#code-example), the default parameter value is explicitly 1000ms. The LLM recited '500' milliseconds from pre-trained memory (which is the true v3 default), but because the prompt mandated grounding in retrieved context, the LLM hallucinated a citation attributing the 500ms value to the outdated v2 chunk [v2_client_send#code-example].",
+    "incident_classification": "Confidently, Faithfully Wrong — Outdated retrieval combined with hallucinated citation attribution."
+  }
+}
