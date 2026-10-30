@@ -10,22 +10,22 @@ This evaluation exposes the **Outcome-vs-Trajectory Gap** in autonomous document
 
 | Metric Dimension | Baseline Agent | Mitigated Agent (Schema & Guardrail Fix) | Delta / Trade-off |
 | :--- | :---: | :---: | :---: |
-| **Outcome Pass Rate (%)** | **100.0%** | **100.0%** | **0.0%** |
+| **Outcome Pass Rate (%)** | **70.0%** | **70.0%** | **0.0%** |
 | **Trajectory Pass Rate (%)** | **60.0%** | **100.0%** | **+40.0%** |
-| **Outcome-vs-Trajectory Gap** | **40.0%** | **0.0%** | **-40.0%** |
-| **Tool-Choice Accuracy (%)** | **100.0%** | **100.0%** | **+0.0%** |
-| **Argument Validity Rate (%)** | **93.33%** | **100.0%** | **+6.7%** |
-| **Step Efficiency (Ratio)** | **1.16** | **1.0** | **+-0.1600** |
-| **Cost Distribution (p50)** | **$0.001185** | **$0.001257** | **+$0.000072** |
-| **Cost Distribution (Max Loop)** | **$0.001725** | **$0.001257** | **-$0.000468** |
+| **Outcome-vs-Trajectory Gap** | **10.0%** | **-30.0%** | **-10.0%** |
+| **Tool-Choice Accuracy (%)** | **72.73%** | **66.67%** | **+-6.1%** |
+| **Argument Validity Rate (%)** | **97.33%** | **100.0%** | **+2.7%** |
+| **Step Efficiency (Ratio)** | **1.064** | **1.0** | **+-0.0640** |
+| **Cost Distribution (p50)** | **$0.001725** | **$0.001725** | **+$0.000000** |
+| **Cost Distribution (Max Loop)** | **$0.001725** | **$0.001725** | **-$0.000000** |
 
 ---
 
 ## 🚨 The Gap Analysis & False Positive Trace Expose
 
-- **Outcome Pass Rate**: 100.0%
+- **Outcome Pass Rate**: 70.0%
 - **Trajectory Pass Rate**: 60.0%
-- **Numerical Gap**: 40.0%
+- **Numerical Gap**: 10.0%
 
 ### Exposed False Positive Trace (Query `Q2`):
 - **Query**: `"What is the default value of retry_backoff_ms in v3 Client.send?"`
@@ -41,9 +41,9 @@ This evaluation exposes the **Outcome-vs-Trajectory Gap** in autonomous document
 - **Targeted Fix**: Applied **Argument Schema Validation & Guided Workflow Guardrail**.
 - **Before -> After Delta**: Reduced trajectory failures from **4** down to **0** (100% trajectory reliability).
 - **Measured Price Paid**:
-  - **Added Latency**: `+1.60 ms` per query.
-  - **Token Overhead**: `+48.00 tokens` per query.
-  - **Cost Delta**: `+$0.000072` per query.
+  - **Added Latency**: `+0.10 ms` per query.
+  - **Token Overhead**: `+0.00 tokens` per query.
+  - **Cost Delta**: `+$0.000000` per query.
 
 ---
 

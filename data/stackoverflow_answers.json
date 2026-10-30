@@ -1,0 +1,602 @@
+[
+  {
+    "id": "SO_01",
+    "title": "How to query records using python sdk client? (Thread #1)",
+    "query_phrasing": "How to query records using python sdk client? [case 1]",
+    "accepted_snippet": "client.query(\"SELECT * FROM users\")",
+    "target_sdk_version": "v1.x",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_02",
+    "title": "Python SDK Client.send retry backoff configuration (Thread #2)",
+    "query_phrasing": "Python SDK Client.send retry backoff configuration [case 2]",
+    "accepted_snippet": "client.send(request_body={\"key\": \"val\"}, retry_backoff_ms=1000)",
+    "target_sdk_version": "v2.0",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_03",
+    "title": "Execute query with timeout on legacy SDK (Thread #3)",
+    "query_phrasing": "Execute query with timeout on legacy SDK [case 3]",
+    "accepted_snippet": "client.execute_query(\"SELECT * FROM orders\", timeout=30)",
+    "target_sdk_version": "v1.0",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.execute_query"
+    ]
+  },
+  {
+    "id": "SO_04",
+    "title": "Paginate query results using cursor (Thread #4)",
+    "query_phrasing": "Paginate query results using cursor [case 4]",
+    "accepted_snippet": "page = client.query_paginated(cursor=\"cur_123\", limit=50)",
+    "target_sdk_version": "v2.2",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query_paginated"
+    ]
+  },
+  {
+    "id": "SO_05",
+    "title": "Renew expired auth token in SDK (Thread #5)",
+    "query_phrasing": "Renew expired auth token in SDK [case 5]",
+    "accepted_snippet": "auth.old_token_renew(token=\"expired_tok\")",
+    "target_sdk_version": "v2.1",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "Auth.old_token_renew"
+    ]
+  },
+  {
+    "id": "SO_06",
+    "title": "Set token TTL during login (Thread #6)",
+    "query_phrasing": "Set token TTL during login [case 6]",
+    "accepted_snippet": "auth.login(username=\"admin\", password=\"pw\", old_ttl=86400)",
+    "target_sdk_version": "v2.3",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "old_ttl"
+    ]
+  },
+  {
+    "id": "SO_07",
+    "title": "Post batch records synchronously (Thread #7)",
+    "query_phrasing": "Post batch records synchronously [case 7]",
+    "accepted_snippet": "client.post(\"/v2/legacy/batch\", json={\"records\": [1,2,3]})",
+    "target_sdk_version": "v2.0",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "/v2/legacy/batch"
+    ]
+  },
+  {
+    "id": "SO_08",
+    "title": "Raw HTTP request with client.raw_call (Thread #8)",
+    "query_phrasing": "Raw HTTP request with client.raw_call [case 8]",
+    "accepted_snippet": "client.raw_call(path=\"/v1/query\", data={})",
+    "target_sdk_version": "v1.1",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.raw_call"
+    ]
+  },
+  {
+    "id": "SO_09",
+    "title": "Client send without mandatory parameters (Thread #9)",
+    "query_phrasing": "Client send without mandatory parameters [case 9]",
+    "accepted_snippet": "client.send(request_body={\"action\": \"ping\"})",
+    "target_sdk_version": "v2.4",
+    "year": 2022,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_10",
+    "title": "Search records without timeout parameter (Thread #10)",
+    "query_phrasing": "Search records without timeout parameter [case 10]",
+    "accepted_snippet": "client.query(\"find user where id=10\")",
+    "target_sdk_version": "v2.2",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_11",
+    "title": "How to query records using python sdk client? (Thread #11)",
+    "query_phrasing": "How to query records using python sdk client? [case 11]",
+    "accepted_snippet": "client.query(\"SELECT * FROM users\")",
+    "target_sdk_version": "v1.x",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_12",
+    "title": "Python SDK Client.send retry backoff configuration (Thread #12)",
+    "query_phrasing": "Python SDK Client.send retry backoff configuration [case 12]",
+    "accepted_snippet": "client.send(request_body={\"key\": \"val\"}, retry_backoff_ms=1000)",
+    "target_sdk_version": "v2.0",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_13",
+    "title": "Execute query with timeout on legacy SDK (Thread #13)",
+    "query_phrasing": "Execute query with timeout on legacy SDK [case 13]",
+    "accepted_snippet": "client.execute_query(\"SELECT * FROM orders\", timeout=30)",
+    "target_sdk_version": "v1.0",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.execute_query"
+    ]
+  },
+  {
+    "id": "SO_14",
+    "title": "Paginate query results using cursor (Thread #14)",
+    "query_phrasing": "Paginate query results using cursor [case 14]",
+    "accepted_snippet": "page = client.query_paginated(cursor=\"cur_123\", limit=50)",
+    "target_sdk_version": "v2.2",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query_paginated"
+    ]
+  },
+  {
+    "id": "SO_15",
+    "title": "Renew expired auth token in SDK (Thread #15)",
+    "query_phrasing": "Renew expired auth token in SDK [case 15]",
+    "accepted_snippet": "auth.old_token_renew(token=\"expired_tok\")",
+    "target_sdk_version": "v2.1",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "Auth.old_token_renew"
+    ]
+  },
+  {
+    "id": "SO_16",
+    "title": "Set token TTL during login (Thread #16)",
+    "query_phrasing": "Set token TTL during login [case 16]",
+    "accepted_snippet": "auth.login(username=\"admin\", password=\"pw\", old_ttl=86400)",
+    "target_sdk_version": "v2.3",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "old_ttl"
+    ]
+  },
+  {
+    "id": "SO_17",
+    "title": "Post batch records synchronously (Thread #17)",
+    "query_phrasing": "Post batch records synchronously [case 17]",
+    "accepted_snippet": "client.post(\"/v2/legacy/batch\", json={\"records\": [1,2,3]})",
+    "target_sdk_version": "v2.0",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "/v2/legacy/batch"
+    ]
+  },
+  {
+    "id": "SO_18",
+    "title": "Raw HTTP request with client.raw_call (Thread #18)",
+    "query_phrasing": "Raw HTTP request with client.raw_call [case 18]",
+    "accepted_snippet": "client.raw_call(path=\"/v1/query\", data={})",
+    "target_sdk_version": "v1.1",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.raw_call"
+    ]
+  },
+  {
+    "id": "SO_19",
+    "title": "Client send without mandatory parameters (Thread #19)",
+    "query_phrasing": "Client send without mandatory parameters [case 19]",
+    "accepted_snippet": "client.send(request_body={\"action\": \"ping\"})",
+    "target_sdk_version": "v2.4",
+    "year": 2022,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_20",
+    "title": "Search records without timeout parameter (Thread #20)",
+    "query_phrasing": "Search records without timeout parameter [case 20]",
+    "accepted_snippet": "client.query(\"find user where id=10\")",
+    "target_sdk_version": "v2.2",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_21",
+    "title": "How to query records using python sdk client? (Thread #21)",
+    "query_phrasing": "How to query records using python sdk client? [case 21]",
+    "accepted_snippet": "client.query(\"SELECT * FROM users\")",
+    "target_sdk_version": "v1.x",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_22",
+    "title": "Python SDK Client.send retry backoff configuration (Thread #22)",
+    "query_phrasing": "Python SDK Client.send retry backoff configuration [case 22]",
+    "accepted_snippet": "client.send(request_body={\"key\": \"val\"}, retry_backoff_ms=1000)",
+    "target_sdk_version": "v2.0",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_23",
+    "title": "Execute query with timeout on legacy SDK (Thread #23)",
+    "query_phrasing": "Execute query with timeout on legacy SDK [case 23]",
+    "accepted_snippet": "client.execute_query(\"SELECT * FROM orders\", timeout=30)",
+    "target_sdk_version": "v1.0",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.execute_query"
+    ]
+  },
+  {
+    "id": "SO_24",
+    "title": "Paginate query results using cursor (Thread #24)",
+    "query_phrasing": "Paginate query results using cursor [case 24]",
+    "accepted_snippet": "page = client.query_paginated(cursor=\"cur_123\", limit=50)",
+    "target_sdk_version": "v2.2",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query_paginated"
+    ]
+  },
+  {
+    "id": "SO_25",
+    "title": "Renew expired auth token in SDK (Thread #25)",
+    "query_phrasing": "Renew expired auth token in SDK [case 25]",
+    "accepted_snippet": "auth.old_token_renew(token=\"expired_tok\")",
+    "target_sdk_version": "v2.1",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "Auth.old_token_renew"
+    ]
+  },
+  {
+    "id": "SO_26",
+    "title": "Set token TTL during login (Thread #26)",
+    "query_phrasing": "Set token TTL during login [case 26]",
+    "accepted_snippet": "auth.login(username=\"admin\", password=\"pw\", old_ttl=86400)",
+    "target_sdk_version": "v2.3",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "old_ttl"
+    ]
+  },
+  {
+    "id": "SO_27",
+    "title": "Post batch records synchronously (Thread #27)",
+    "query_phrasing": "Post batch records synchronously [case 27]",
+    "accepted_snippet": "client.post(\"/v2/legacy/batch\", json={\"records\": [1,2,3]})",
+    "target_sdk_version": "v2.0",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "/v2/legacy/batch"
+    ]
+  },
+  {
+    "id": "SO_28",
+    "title": "Raw HTTP request with client.raw_call (Thread #28)",
+    "query_phrasing": "Raw HTTP request with client.raw_call [case 28]",
+    "accepted_snippet": "client.raw_call(path=\"/v1/query\", data={})",
+    "target_sdk_version": "v1.1",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.raw_call"
+    ]
+  },
+  {
+    "id": "SO_29",
+    "title": "Client send without mandatory parameters (Thread #29)",
+    "query_phrasing": "Client send without mandatory parameters [case 29]",
+    "accepted_snippet": "client.send(request_body={\"action\": \"ping\"})",
+    "target_sdk_version": "v2.4",
+    "year": 2022,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_30",
+    "title": "Search records without timeout parameter (Thread #30)",
+    "query_phrasing": "Search records without timeout parameter [case 30]",
+    "accepted_snippet": "client.query(\"find user where id=10\")",
+    "target_sdk_version": "v2.2",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_31",
+    "title": "How to query records using python sdk client? (Thread #31)",
+    "query_phrasing": "How to query records using python sdk client? [case 31]",
+    "accepted_snippet": "client.query(\"SELECT * FROM users\")",
+    "target_sdk_version": "v1.x",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_32",
+    "title": "Python SDK Client.send retry backoff configuration (Thread #32)",
+    "query_phrasing": "Python SDK Client.send retry backoff configuration [case 32]",
+    "accepted_snippet": "client.send(request_body={\"key\": \"val\"}, retry_backoff_ms=1000)",
+    "target_sdk_version": "v2.0",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_33",
+    "title": "Execute query with timeout on legacy SDK (Thread #33)",
+    "query_phrasing": "Execute query with timeout on legacy SDK [case 33]",
+    "accepted_snippet": "client.execute_query(\"SELECT * FROM orders\", timeout=30)",
+    "target_sdk_version": "v1.0",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.execute_query"
+    ]
+  },
+  {
+    "id": "SO_34",
+    "title": "Paginate query results using cursor (Thread #34)",
+    "query_phrasing": "Paginate query results using cursor [case 34]",
+    "accepted_snippet": "page = client.query_paginated(cursor=\"cur_123\", limit=50)",
+    "target_sdk_version": "v2.2",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query_paginated"
+    ]
+  },
+  {
+    "id": "SO_35",
+    "title": "Renew expired auth token in SDK (Thread #35)",
+    "query_phrasing": "Renew expired auth token in SDK [case 35]",
+    "accepted_snippet": "auth.old_token_renew(token=\"expired_tok\")",
+    "target_sdk_version": "v2.1",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "Auth.old_token_renew"
+    ]
+  },
+  {
+    "id": "SO_36",
+    "title": "Set token TTL during login (Thread #36)",
+    "query_phrasing": "Set token TTL during login [case 36]",
+    "accepted_snippet": "auth.login(username=\"admin\", password=\"pw\", old_ttl=86400)",
+    "target_sdk_version": "v2.3",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "old_ttl"
+    ]
+  },
+  {
+    "id": "SO_37",
+    "title": "Post batch records synchronously (Thread #37)",
+    "query_phrasing": "Post batch records synchronously [case 37]",
+    "accepted_snippet": "client.post(\"/v2/legacy/batch\", json={\"records\": [1,2,3]})",
+    "target_sdk_version": "v2.0",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "/v2/legacy/batch"
+    ]
+  },
+  {
+    "id": "SO_38",
+    "title": "Raw HTTP request with client.raw_call (Thread #38)",
+    "query_phrasing": "Raw HTTP request with client.raw_call [case 38]",
+    "accepted_snippet": "client.raw_call(path=\"/v1/query\", data={})",
+    "target_sdk_version": "v1.1",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.raw_call"
+    ]
+  },
+  {
+    "id": "SO_39",
+    "title": "Client send without mandatory parameters (Thread #39)",
+    "query_phrasing": "Client send without mandatory parameters [case 39]",
+    "accepted_snippet": "client.send(request_body={\"action\": \"ping\"})",
+    "target_sdk_version": "v2.4",
+    "year": 2022,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_40",
+    "title": "Search records without timeout parameter (Thread #40)",
+    "query_phrasing": "Search records without timeout parameter [case 40]",
+    "accepted_snippet": "client.query(\"find user where id=10\")",
+    "target_sdk_version": "v2.2",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_41",
+    "title": "How to query records using python sdk client? (Thread #41)",
+    "query_phrasing": "How to query records using python sdk client? [case 41]",
+    "accepted_snippet": "client.query(\"SELECT * FROM users\")",
+    "target_sdk_version": "v1.x",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  },
+  {
+    "id": "SO_42",
+    "title": "Python SDK Client.send retry backoff configuration (Thread #42)",
+    "query_phrasing": "Python SDK Client.send retry backoff configuration [case 42]",
+    "accepted_snippet": "client.send(request_body={\"key\": \"val\"}, retry_backoff_ms=1000)",
+    "target_sdk_version": "v2.0",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_43",
+    "title": "Execute query with timeout on legacy SDK (Thread #43)",
+    "query_phrasing": "Execute query with timeout on legacy SDK [case 43]",
+    "accepted_snippet": "client.execute_query(\"SELECT * FROM orders\", timeout=30)",
+    "target_sdk_version": "v1.0",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.execute_query"
+    ]
+  },
+  {
+    "id": "SO_44",
+    "title": "Paginate query results using cursor (Thread #44)",
+    "query_phrasing": "Paginate query results using cursor [case 44]",
+    "accepted_snippet": "page = client.query_paginated(cursor=\"cur_123\", limit=50)",
+    "target_sdk_version": "v2.2",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query_paginated"
+    ]
+  },
+  {
+    "id": "SO_45",
+    "title": "Renew expired auth token in SDK (Thread #45)",
+    "query_phrasing": "Renew expired auth token in SDK [case 45]",
+    "accepted_snippet": "auth.old_token_renew(token=\"expired_tok\")",
+    "target_sdk_version": "v2.1",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "Auth.old_token_renew"
+    ]
+  },
+  {
+    "id": "SO_46",
+    "title": "Set token TTL during login (Thread #46)",
+    "query_phrasing": "Set token TTL during login [case 46]",
+    "accepted_snippet": "auth.login(username=\"admin\", password=\"pw\", old_ttl=86400)",
+    "target_sdk_version": "v2.3",
+    "year": 2021,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "old_ttl"
+    ]
+  },
+  {
+    "id": "SO_47",
+    "title": "Post batch records synchronously (Thread #47)",
+    "query_phrasing": "Post batch records synchronously [case 47]",
+    "accepted_snippet": "client.post(\"/v2/legacy/batch\", json={\"records\": [1,2,3]})",
+    "target_sdk_version": "v2.0",
+    "year": 2019,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "/v2/legacy/batch"
+    ]
+  },
+  {
+    "id": "SO_48",
+    "title": "Raw HTTP request with client.raw_call (Thread #48)",
+    "query_phrasing": "Raw HTTP request with client.raw_call [case 48]",
+    "accepted_snippet": "client.raw_call(path=\"/v1/query\", data={})",
+    "target_sdk_version": "v1.1",
+    "year": 2018,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.raw_call"
+    ]
+  },
+  {
+    "id": "SO_49",
+    "title": "Client send without mandatory parameters (Thread #49)",
+    "query_phrasing": "Client send without mandatory parameters [case 49]",
+    "accepted_snippet": "client.send(request_body={\"action\": \"ping\"})",
+    "target_sdk_version": "v2.4",
+    "year": 2022,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "request_body"
+    ]
+  },
+  {
+    "id": "SO_50",
+    "title": "Search records without timeout parameter (Thread #50)",
+    "query_phrasing": "Search records without timeout parameter [case 50]",
+    "accepted_snippet": "client.query(\"find user where id=10\")",
+    "target_sdk_version": "v2.2",
+    "year": 2020,
+    "contains_dead_api": true,
+    "dead_symbols": [
+      "client.query"
+    ]
+  }
+]

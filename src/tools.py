@@ -1,133 +1,270 @@
 import enum
 import json
-from typing import Dict, Any, Optional
+import os
+import re
+from typing import Dict, Any, Optional, List
+from src.code_validator import validate_code_sample
 
 class ApiVersion(str, enum.Enum):
     V2 = "v2"
+    V2_4 = "v2.4"
     V3 = "v3"
+    V3_0 = "v3.0"
 
-# Mock database of documentation, OpenAPI specs, and deprecations
-DOCS_DB = {
-    "v2": {
-        "client_send": "Client.send() in v2 uses request_body (dict), retry_backoff_ms (default 1000ms), and timeout (float, default 10.0s).",
-        "auth": "Auth.login() in v2 uses username, password, and old_ttl (int, default 7200). Method old_token_renew is used for renewal.",
-        "batch": "Legacy batch endpoint /v2/legacy/batch processes records synchronously in array format."
-    },
-    "v3": {
-        "client_send": "Client.send() in v3 uses payload (dict), retry_backoff_ms (default 500ms), idempotency_key (str, optional), enable_compression (bool, default True).",
-        "auth": "Auth.login() in v3 uses username, password, token_ttl (int, default 3600). Auth.refresh_token() replaces old_token_renew().",
-        "batch": "BatchProcessor.process() in v3 posts payload to /v3/batch/process asynchronously with worker pool.",
-        "stream": "StreamClient.connect() in v3 connects to /v3/stream/connect with heartbeat_sec (default 15).",
-        "error": "ErrorHandler.catch() in v3 formats error payloads into standardized JSON error objects.",
-        "webhook": "WebhookHandler.verify() in v3 validates HMAC-SHA256 signatures on incoming webhooks at /v3/webhook/verify."
-    }
-}
-
-OPENAPI_SPECS = {
-    "v2": {
-        "/v2/client/send": {"method": "POST", "parameters": {"request_body": "object", "retry_backoff_ms": "integer", "timeout": "number"}},
-        "/v2/auth/login": {"method": "POST", "parameters": {"username": "string", "password": "string", "old_ttl": "integer"}},
-        "/v2/legacy/batch": {"method": "POST", "parameters": {"records": "array"}}
-    },
-    "v3": {
-        "/v3/client/send": {"method": "POST", "parameters": {"payload": "object", "retry_backoff_ms": "integer", "idempotency_key": "string", "enable_compression": "boolean"}},
-        "/v3/auth/login": {"method": "POST", "parameters": {"username": "string", "password": "string", "token_ttl": "integer"}},
-        "/v3/auth/refresh": {"method": "POST", "parameters": {"refresh_token": "string"}},
-        "/v3/batch/process": {"method": "POST", "parameters": {"items": "array", "async_mode": "boolean"}},
-        "/v3/stream/connect": {"method": "GET", "parameters": {"stream_id": "string", "heartbeat_sec": "integer"}},
-        "/v3/webhook/verify": {"method": "POST", "parameters": {"payload": "string", "signature": "string"}},
-        "/v3/error/handle": {"method": "POST", "parameters": {"error_code": "string", "trace_id": "string"}}
-    }
-}
-
+# Formal Deprecation Registry across all SDK generations
 DEPRECATION_REGISTRY = {
-    "v2": {},
-    "v3": {
-        "request_body": {
-            "deprecated": True,
-            "since_version": "v3.0.0",
-            "replacement": "payload",
-            "note": "Parameter 'request_body' in Client.send was renamed to 'payload' in v3 SDK."
-        },
-        "old_ttl": {
-            "deprecated": True,
-            "since_version": "v3.0.0",
-            "replacement": "token_ttl",
-            "note": "Parameter 'old_ttl' in Auth.login was replaced by 'token_ttl' (seconds)."
-        },
-        "old_token_renew": {
-            "deprecated": True,
-            "since_version": "v3.0.0",
-            "replacement": "Auth.refresh_token",
-            "note": "Method 'old_token_renew' was removed in v3. Use 'Auth.refresh_token(refresh_token=...)' instead."
-        },
-        "/v2/legacy/batch": {
-            "deprecated": True,
-            "since_version": "v3.0.0",
-            "replacement": "/v3/batch/process",
-            "note": "Endpoint '/v2/legacy/batch' is obsolete. Use async endpoint '/v3/batch/process'."
-        },
-        "Client.send": {
-            "deprecated": False,
-            "since_version": None,
-            "replacement": None,
-            "note": "Client.send is active in v3. Note default retry_backoff_ms changed from 1000ms to 500ms."
-        },
-        "Auth.login": {
-            "deprecated": False,
-            "since_version": None,
-            "replacement": None,
-            "note": "Auth.login is active in v3."
-        },
-        "StreamClient.connect": {
-            "deprecated": False,
-            "since_version": None,
-            "replacement": None,
-            "note": "StreamClient.connect is active in v3."
-        },
-        "BatchProcessor.process": {
-            "deprecated": False,
-            "since_version": None,
-            "replacement": None,
-            "note": "BatchProcessor.process is active in v3."
-        },
-        "WebhookHandler.verify": {
-            "deprecated": False,
-            "since_version": None,
-            "replacement": None,
-            "note": "WebhookHandler.verify is active in v3."
-        }
+    "client.query": {
+        "symbol": "client.query",
+        "deprecated": True,
+        "deprecated_in": "v2.4.0",
+        "removed_in": "v3.0.0",
+        "replacement": "client.search",
+        "migration_note": "Method client.query() was renamed and removed in v3.0.0. Use client.search(query=..., timeout=10.0) where timeout is mandatory."
+    },
+    "request_body": {
+        "symbol": "request_body",
+        "deprecated": True,
+        "deprecated_in": "v2.4.0",
+        "removed_in": "v3.0.0",
+        "replacement": "payload",
+        "migration_note": "Parameter 'request_body' in client.send() was renamed to 'payload' in v3.0.0. Note default retry_backoff_ms was reduced from 1000ms to 500ms."
+    },
+    "client.query_paginated": {
+        "symbol": "client.query_paginated",
+        "deprecated": True,
+        "deprecated_in": "v2.4.0",
+        "removed_in": "v3.0.0",
+        "replacement": "client.paginate",
+        "migration_note": "Method client.query_paginated() was removed in v3.0.0. Use client.paginate(page_size=..., cursor=...)."
+    },
+    "old_ttl": {
+        "symbol": "old_ttl",
+        "deprecated": True,
+        "deprecated_in": "v2.4.0",
+        "removed_in": "v3.0.0",
+        "replacement": "token_ttl",
+        "migration_note": "Parameter 'old_ttl' in Auth.login() was replaced by 'token_ttl' (seconds)."
+    },
+    "old_token_renew": {
+        "symbol": "old_token_renew",
+        "deprecated": True,
+        "deprecated_in": "v2.4.0",
+        "removed_in": "v3.0.0",
+        "replacement": "Auth.refresh_token",
+        "migration_note": "Method 'old_token_renew' was removed in v3.0.0. Use 'Auth.refresh_token(refresh_token=...)'."
+    },
+    "/v2/legacy/batch": {
+        "symbol": "/v2/legacy/batch",
+        "deprecated": True,
+        "deprecated_in": "v2.4.0",
+        "removed_in": "v3.0.0",
+        "replacement": "/v3/batch/process",
+        "migration_note": "Endpoint '/v2/legacy/batch' was removed in v3.0.0. Use async endpoint '/v3/batch/process' via BatchProcessor.process()."
+    },
+    "client.execute_query": {
+        "symbol": "client.execute_query",
+        "deprecated": True,
+        "deprecated_in": "v1.0.0",
+        "removed_in": "v2.0.0",
+        "replacement": "client.search (in v3) or client.query (in v2)",
+        "migration_note": "Method 'client.execute_query' is an ancient dead API from v1.0, popular on Stack Overflow, removed in v2.0."
     }
 }
 
-def search_docs(query: str, api_version: ApiVersion = ApiVersion.V3) -> Dict[str, Any]:
-    """Search developer documentation articles by keyword query to locate parameter definitions, usage guides, and code examples for a specific API version."""
-    version_str = api_version.value if isinstance(api_version, ApiVersion) else str(api_version)
-    query_lower = query.lower()
-    matches = []
+# Formal Symbol Existence Matrix
+SYMBOL_EXISTENCE_MATRIX = {
+    "v2": {
+        "client.query": {"exists": True, "mandatory": ["query"], "optional": ["timeout"], "status": "active_in_v2_deprecated_for_v3"},
+        "client.send": {"exists": True, "mandatory": ["request_body"], "optional": ["retry_backoff_ms", "timeout"], "status": "active"},
+        "client.query_paginated": {"exists": True, "mandatory": [], "optional": ["cursor", "limit"], "status": "active_in_v2_deprecated_for_v3"},
+        "auth.login": {"exists": True, "mandatory": ["username", "password"], "optional": ["old_ttl"], "status": "active"},
+        "auth.old_token_renew": {"exists": True, "mandatory": ["token"], "optional": [], "status": "active_in_v2_deprecated_for_v3"},
+        "client.search": {"exists": False, "status": "not_introduced", "note": "Introduced in v3.0.0. Does not exist in v2.4."},
+        "client.paginate": {"exists": False, "status": "not_introduced", "note": "Introduced in v3.0.0. Does not exist in v2.4."},
+        "auth.refresh_token": {"exists": False, "status": "not_introduced", "note": "Introduced in v3.0.0. Does not exist in v2.4."},
+        "client.execute_query": {"exists": False, "status": "removed_in_v2", "note": "Dead API from v1.0."}
+    },
+    "v3": {
+        "client.search": {"exists": True, "mandatory": ["query", "timeout"], "optional": [], "status": "active"},
+        "client.send": {"exists": True, "mandatory": ["payload"], "optional": ["retry_backoff_ms", "idempotency_key", "enable_compression"], "status": "active"},
+        "client.paginate": {"exists": True, "mandatory": [], "optional": ["page_size", "cursor"], "status": "active"},
+        "auth.login": {"exists": True, "mandatory": ["username", "password"], "optional": ["token_ttl"], "status": "active"},
+        "auth.refresh_token": {"exists": True, "mandatory": ["refresh_token"], "optional": [], "status": "active"},
+        "batchprocessor.process": {"exists": True, "mandatory": ["items"], "optional": ["async_mode"], "status": "active"},
+        "streamclient.connect": {"exists": True, "mandatory": ["stream_id"], "optional": ["heartbeat_sec"], "status": "active"},
+        "webhookhandler.verify": {"exists": True, "mandatory": ["payload", "signature"], "optional": [], "status": "active"},
+        "errorhandler.catch": {"exists": True, "mandatory": ["error_payload"], "optional": [], "status": "active"},
+        "client.query": {"exists": False, "status": "removed_in_v3", "replacement": "client.search", "note": "Removed in v3.0.0. Use client.search(query=..., timeout=10.0)."},
+        "client.query_paginated": {"exists": False, "status": "removed_in_v3", "replacement": "client.paginate", "note": "Removed in v3.0.0. Use client.paginate()."},
+        "auth.old_token_renew": {"exists": False, "status": "removed_in_v3", "replacement": "Auth.refresh_token", "note": "Removed in v3.0.0. Use Auth.refresh_token()."},
+        "client.execute_query": {"exists": False, "status": "dead_api", "replacement": "client.search", "note": "Dead v1 API from 2018 Stack Overflow answers."}
+    }
+}
+
+# Cached retriever instance for fast in-process searches
+_CACHED_RETRIEVER = None
+
+def get_shared_retriever():
+    global _CACHED_RETRIEVER
+    if _CACHED_RETRIEVER is None:
+        from src.ingest import load_docs
+        from src.chunkers import StructureAwareChunker
+        from src.retriever import Retriever
+        
+        docs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "docs")
+        if not os.path.exists(docs_dir):
+            docs_dir = "data/docs"
+        docs = load_docs(docs_dir)
+        chunker = StructureAwareChunker()
+        all_chunks = []
+        for d in docs:
+            all_chunks.extend(chunker.chunk_document(d))
+        _CACHED_RETRIEVER = Retriever(all_chunks, mode="hybrid")
+    return _CACHED_RETRIEVER
+
+def search_docs(query: str, api_version: str = "v3", top_k: int = 3) -> Dict[str, Any]:
+    """
+    Tool 1: Version-scoped doc search against active SDK reference documentation chunks.
+    Filters exclusively on caller's SDK version family ('v2' or 'v3').
+    """
+    norm_ver = "v2" if "2" in str(api_version) else "v3"
+    retriever = get_shared_retriever()
     
-    docs_for_ver = DOCS_DB.get(version_str, {})
-    for page_id, content in docs_for_ver.items():
-        if any(term in content.lower() or term in page_id.lower() for term in query_lower.split()):
-            matches.append({"page_id": page_id, "content": content})
-            
-    if not matches and version_str in DOCS_DB:
-        for page_id, content in DOCS_DB[version_str].items():
-            matches.append({"page_id": page_id, "content": content})
-            
+    # Strictly enforce metadata filtering by version
+    results = retriever.search_hybrid(
+        query=query,
+        top_k=top_k,
+        filters={"sdk_version": norm_ver}
+    )
+    
+    formatted_results = []
+    for r in results:
+        # Create clickable versioned doc citation
+        page_id = r["page_id"]
+        anchor = r["chunk_id"].split("#")[-1] if "#" in r["chunk_id"] else "overview"
+        source_rel = os.path.relpath(r["source_file"], "data/docs") if "source_file" in r else f"{norm_ver}/{page_id}.md"
+        version_tag = "v2.4" if norm_ver == "v2" else "v3.0"
+        citation_str = f"[{version_tag}/{source_rel}#{anchor}]"
+        
+        formatted_results.append({
+            "chunk_id": r["chunk_id"],
+            "page_id": page_id,
+            "sdk_version": norm_ver,
+            "version_tag": version_tag,
+            "citation": citation_str,
+            "content": r["content"],
+            "score": r.get("score", 1.0)
+        })
+
     return {
         "tool": "search_docs",
-        "api_version": version_str,
+        "api_version": norm_ver,
         "query": query,
-        "count": len(matches),
-        "results": matches[:2]
+        "count": len(formatted_results),
+        "results": formatted_results
     }
 
-def get_openapi_spec(endpoint: str, api_version: ApiVersion = ApiVersion.V3) -> Dict[str, Any]:
-    """Retrieve the raw JSON OpenAPI 3.0 endpoint schema specification including request bodies, response schemas, and parameter types."""
-    version_str = api_version.value if isinstance(api_version, ApiVersion) else str(api_version)
-    specs = OPENAPI_SPECS.get(version_str, {})
+def check_deprecation(symbol: str, api_version: str = "v2.4") -> Dict[str, Any]:
+    """
+    Tool 2: Changelog/deprecation lookup. Checks whether symbol or parameter is deprecated
+    and retrieves its removal version, replacement method, and migration note.
+    """
+    clean_sym = symbol.strip().lower()
+    match = None
+    for k, info in DEPRECATION_REGISTRY.items():
+        if k in clean_sym or clean_sym in k or clean_sym.endswith(k.split(".")[-1]):
+            match = info
+            break
+            
+    if match:
+        return {
+            "tool": "check_deprecation",
+            "symbol": symbol,
+            "is_deprecated": True,
+            "deprecated_in": match["deprecated_in"],
+            "removed_in": match["removed_in"],
+            "replacement": match["replacement"],
+            "migration_note": match["migration_note"]
+        }
+    return {
+        "tool": "check_deprecation",
+        "symbol": symbol,
+        "is_deprecated": False,
+        "deprecated_in": None,
+        "removed_in": None,
+        "replacement": None,
+        "migration_note": f"Symbol '{symbol}' is active with no recorded deprecation notice."
+    }
+
+def check_symbol_exists(symbol: str, api_version: str = "v3") -> Dict[str, Any]:
+    """
+    Tool 3: Symbol-exists check against caller's SDK version.
+    Determines whether a method, parameter, or class exists in that version.
+    """
+    norm_ver = "v2" if "2" in str(api_version) else "v3"
+    clean_sym = symbol.strip().lower()
+    matrix = SYMBOL_EXISTENCE_MATRIX.get(norm_ver, {})
     
+    match = None
+    for k, info in matrix.items():
+        if k in clean_sym or clean_sym in k or clean_sym.endswith(k.split(".")[-1]):
+            match = (k, info)
+            break
+            
+    if match:
+        k, info = match
+        return {
+            "tool": "check_symbol_exists",
+            "symbol": k,
+            "api_version": norm_ver,
+            "exists": info.get("exists", False),
+            "status": info.get("status", "active"),
+            "mandatory_args": info.get("mandatory", []),
+            "optional_args": info.get("optional", []),
+            "replacement": info.get("replacement"),
+            "note": info.get("note", "")
+        }
+        
+    # Default fallback: check if known in other version
+    other_ver = "v3" if norm_ver == "v2" else "v2"
+    other_matrix = SYMBOL_EXISTENCE_MATRIX.get(other_ver, {})
+    for k, info in other_matrix.items():
+        if k in clean_sym or clean_sym in k:
+            if norm_ver == "v2":
+                return {
+                    "tool": "check_symbol_exists",
+                    "symbol": k,
+                    "api_version": norm_ver,
+                    "exists": False,
+                    "status": "not_introduced",
+                    "note": f"Symbol '{k}' was introduced in {other_ver}. It DOES NOT exist in {norm_ver}."
+                }
+            else:
+                return {
+                    "tool": "check_symbol_exists",
+                    "symbol": k,
+                    "api_version": norm_ver,
+                    "exists": False,
+                    "status": "removed",
+                    "note": f"Symbol '{k}' was a legacy method in {other_ver}. It DOES NOT exist in {norm_ver}."
+                }
+
+    return {
+        "tool": "check_symbol_exists",
+        "symbol": symbol,
+        "api_version": norm_ver,
+        "exists": True,
+        "status": "unknown_assumed_valid",
+        "mandatory_args": [],
+        "optional_args": [],
+        "note": "Symbol not in deprecation matrix; assumed standard active symbol."
+    }
+
+def get_openapi_spec(endpoint: str, api_version: str = "v3") -> Dict[str, Any]:
+    """Retrieve OpenAPI spec for endpoint."""
+    norm_ver = "v2" if "2" in str(api_version) else "v3"
+    from mcp_servers.docs_server import OPENAPI_SPECS
+    specs = OPENAPI_SPECS.get(norm_ver, OPENAPI_SPECS.get("v3", {}))
     spec = specs.get(endpoint)
     if not spec:
         for ep, sp in specs.items():
@@ -135,52 +272,4 @@ def get_openapi_spec(endpoint: str, api_version: ApiVersion = ApiVersion.V3) -> 
                 spec = sp
                 endpoint = ep
                 break
-                
-    if not spec:
-        return {
-            "tool": "get_openapi_spec",
-            "api_version": version_str,
-            "endpoint": endpoint,
-            "status": "not_found",
-            "spec": None
-        }
-        
-    return {
-        "tool": "get_openapi_spec",
-        "api_version": version_str,
-        "endpoint": endpoint,
-        "status": "found",
-        "spec": spec
-    }
-
-def check_deprecation(endpoint: str, api_version: ApiVersion = ApiVersion.V3) -> Dict[str, Any]:
-    """Query the SDK deprecation registry to check if an endpoint or method symbol is deprecated in a specific API version and retrieve its migration replacement."""
-    version_str = api_version.value if isinstance(api_version, ApiVersion) else str(api_version)
-    registry = DEPRECATION_REGISTRY.get(version_str, {})
-    
-    entry = registry.get(endpoint)
-    if not entry:
-        for key, info in registry.items():
-            if key in endpoint or endpoint in key:
-                entry = info
-                endpoint = key
-                break
-                
-    if not entry:
-        return {
-            "tool": "check_deprecation",
-            "api_version": version_str,
-            "symbol_or_endpoint": endpoint,
-            "is_deprecated": False,
-            "replacement": None,
-            "note": f"Symbol '{endpoint}' has no active deprecation record in {version_str}."
-        }
-        
-    return {
-        "tool": "check_deprecation",
-        "api_version": version_str,
-        "symbol_or_endpoint": endpoint,
-        "is_deprecated": entry["deprecated"],
-        "replacement": entry.get("replacement"),
-        "note": entry["note"]
-    }
+    return {"tool": "get_openapi_spec", "api_version": norm_ver, "endpoint": endpoint, "status": "found" if spec else "not_found", "spec": spec}

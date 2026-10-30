@@ -1,0 +1,42 @@
+[
+  {
+    "issue_id": 412,
+    "title": "AttributeError: 'Client' object has no attribute 'query' in v3.0",
+    "reporter": "integrator_alpha",
+    "caller_version": "v3.0.0",
+    "body": "I copied snippet from docs and called client.query('SELECT *'). It failed with AttributeError.",
+    "resolution": "Client.query() was removed in v3.0.0. Replace with client.search(query=..., timeout=10.0)."
+  },
+  {
+    "issue_id": 419,
+    "title": "TypeError: search() missing 1 required positional argument: 'timeout'",
+    "reporter": "integrator_beta",
+    "caller_version": "v3.0.0",
+    "body": "Client.search('my_query') throws missing timeout argument.",
+    "resolution": "Timeout was made mandatory in v3.0. Pass timeout=10.0."
+  },
+  {
+    "issue_id": 427,
+    "title": "TypeError: send() got an unexpected keyword argument 'request_body'",
+    "reporter": "integrator_gamma",
+    "caller_version": "v3.0.0",
+    "body": "client.send(request_body={...}) fails in production after upgrading to v3.",
+    "resolution": "Parameter request_body was renamed to payload in v3.0.0."
+  },
+  {
+    "issue_id": 435,
+    "title": "AttributeError: 'Client' object has no attribute 'search' in v2.4",
+    "reporter": "integrator_delta",
+    "caller_version": "v2.4.0",
+    "body": "Docs bot gave me client.search(...) snippet but we are still on v2.4 and it fails.",
+    "resolution": "v2.4 still uses client.query(...). Do not use v3 search methods on v2.4."
+  },
+  {
+    "issue_id": 448,
+    "title": "AttributeError: 'Client' object has no attribute 'paginate' in v2.4",
+    "reporter": "integrator_epsilon",
+    "caller_version": "v2.4.0",
+    "body": "Docs bot provided client.paginate() which does not exist in v2.4.",
+    "resolution": "v2.4 uses client.query_paginated(cursor=..., limit=50)."
+  }
+]

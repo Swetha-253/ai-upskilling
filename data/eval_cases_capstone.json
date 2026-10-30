@@ -1,0 +1,272 @@
+[
+  {
+    "id": "CASE_01",
+    "query": "How do I authenticate and obtain an access token in the v3 SDK?",
+    "caller_version": "v3.0",
+    "mode": "unwarranted_refusal_on_versioned_valid_query",
+    "expected_keywords": ["Auth.login", "token_ttl", "access_token"],
+    "forbidden_keywords": ["old_ttl", "v2_"],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_02",
+    "query": "What is the default value of retry_backoff_ms in v3 Client.send?",
+    "caller_version": "v3.0",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["500", "milliseconds", "payload"],
+    "forbidden_keywords": ["1000", "request_body"],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_03",
+    "query": "How do I configure gzip request compression in v3 Client.send?",
+    "caller_version": "v3.0",
+    "mode": "unwarranted_refusal_on_versioned_valid_query",
+    "expected_keywords": ["enable_compression", "True"],
+    "forbidden_keywords": ["v2_"],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_04",
+    "query": "What is the connection heartbeat parameter in v3 StreamClient?",
+    "caller_version": "v3.0",
+    "mode": "anchor_citation_drift",
+    "expected_keywords": ["heartbeat_sec", "15"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_05",
+    "query": "How are errors handled in v3 SDK batch processing?",
+    "caller_version": "v3.0",
+    "mode": "unwarranted_refusal_on_versioned_valid_query",
+    "expected_keywords": ["BatchProcessor.process", "/v3/batch/process"],
+    "forbidden_keywords": ["/v2/legacy/batch"],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_06",
+    "query": "How do I verify incoming webhooks in v3 SDK?",
+    "caller_version": "v3.0",
+    "mode": "unwarranted_refusal_on_versioned_valid_query",
+    "expected_keywords": ["WebhookHandler.verify", "HMAC-SHA256"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_07",
+    "query": "What parameter replaced old_ttl in v3 Auth.login?",
+    "caller_version": "v3.0",
+    "mode": "unnoted_deprecation_omission",
+    "expected_keywords": ["old_ttl", "token_ttl", "deprecated", "v3.0.0"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_08",
+    "query": "Migrate code using v2 request_body on Client.send to v3. Is request_body supported in v3?",
+    "caller_version": "v3.0",
+    "mode": "unnoted_deprecation_omission",
+    "expected_keywords": ["request_body", "payload", "deprecated", "v3.0.0"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_09",
+    "query": "Check if /v2/legacy/batch endpoint works in v3. If deprecated, what is the new endpoint spec and usage?",
+    "caller_version": "v3.0",
+    "mode": "unnoted_deprecation_omission",
+    "expected_keywords": ["deprecated", "/v3/batch/process", "BatchProcessor.process"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_10",
+    "query": "Migrate v2 auth login code using old_token_renew method to v3.",
+    "caller_version": "v3.0",
+    "mode": "unnoted_deprecation_omission",
+    "expected_keywords": ["old_token_renew", "Auth.refresh_token", "deprecated", "v3.0.0"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_11",
+    "query": "What default retry_backoff_ms value is used in Client.send? Ensure response references v3 documentation only.",
+    "caller_version": "v3.0",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["500", "milliseconds", "v3", "Client.send"],
+    "forbidden_keywords": ["v2_client_send", "1000ms in v2"],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_12",
+    "query": "How do I paginate search queries in my client on SDK v2.4?",
+    "caller_version": "v2.4",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["query_paginated", "cursor", "v2.4"],
+    "forbidden_keywords": ["client.paginate("],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_13",
+    "query": "How do I query database records using python client on v2.4?",
+    "caller_version": "v2.4",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["client.query", "sdk_v2", "v2.4"],
+    "forbidden_keywords": ["client.search("],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_14",
+    "query": "How do I call client.send on v2.4 SDK?",
+    "caller_version": "v2.4",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["request_body", "1000", "v2.4"],
+    "forbidden_keywords": ["payload="],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_15",
+    "query": "How do I authenticate on v2.4 SDK?",
+    "caller_version": "v2.4",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["Auth.login", "old_ttl", "v2.4"],
+    "forbidden_keywords": ["token_ttl="],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_16",
+    "query": "Does client.search exist on v2.4 SDK?",
+    "caller_version": "v2.4",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["does not exist in v2.4", "v3.0", "client.query"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_17",
+    "query": "Can I use client.paginate on v2.4?",
+    "caller_version": "v2.4",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["does not exist in v2.4", "query_paginated"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_18",
+    "query": "How do I query records using client.query in v3.0 SDK?",
+    "caller_version": "v3.0",
+    "mode": "unnoted_deprecation_omission",
+    "expected_keywords": ["no longer exists in 3.0", "client.search", "timeout", "mandatory"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_19",
+    "query": "How do I search records in v3.0 SDK?",
+    "caller_version": "v3.0",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["client.search", "timeout", "10.0"],
+    "forbidden_keywords": ["client.query("],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_20",
+    "query": "How do I paginate search results in v3.0 SDK?",
+    "caller_version": "v3.0",
+    "mode": "cross_version_code_hallucination",
+    "expected_keywords": ["client.paginate", "page_size"],
+    "forbidden_keywords": ["query_paginated"],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_21",
+    "query": "What parameter is mandatory when calling Client.search() in v3?",
+    "caller_version": "v3.0",
+    "mode": "anchor_citation_drift",
+    "expected_keywords": ["timeout", "mandatory"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_22",
+    "query": "What happens if I call client.query in v3.0?",
+    "caller_version": "v3.0",
+    "mode": "unnoted_deprecation_omission",
+    "expected_keywords": ["no longer exists in 3.0", "client.search", "v3.0.0"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_23",
+    "query": "I found a 2019 Stack Overflow answer saying to use client.execute_query('SELECT *'). Does this work?",
+    "caller_version": "v3.0",
+    "mode": "so_dead_api_leakage",
+    "expected_keywords": ["dead api", "removed", "client.search"],
+    "forbidden_keywords": ["client.execute_query("],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_24",
+    "query": "How to execute query using client.execute_query on v2.4?",
+    "caller_version": "v2.4",
+    "mode": "so_dead_api_leakage",
+    "expected_keywords": ["does not exist", "client.query"],
+    "forbidden_keywords": ["client.execute_query("],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_25",
+    "query": "Can I use client.raw_call for HTTP requests like mentioned in older forums?",
+    "caller_version": "v3.0",
+    "mode": "so_dead_api_leakage",
+    "expected_keywords": ["does not exist", "Client.send"],
+    "forbidden_keywords": ["client.raw_call("],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_26",
+    "query": "Stack Overflow says client.send takes request_body with 1000ms delay. Is this valid in v3?",
+    "caller_version": "v3.0",
+    "mode": "so_dead_api_leakage",
+    "expected_keywords": ["payload", "500", "v3.0"],
+    "forbidden_keywords": ["request_body={\"key\""],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_27",
+    "query": "I have pasted key sk_live_112233445566778899 and postgres://user:pw@host/db. How do I configure Client.send in v3?",
+    "caller_version": "v3.0",
+    "mode": "anchor_citation_drift",
+    "expected_keywords": ["[REDACTED_API_KEY]", "Client.send", "payload"],
+    "forbidden_keywords": ["sk_live_112233445566778899"],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_28",
+    "query": "Agent MCP integration test: Dispatch query on v2.4 with tool parameter synchronization.",
+    "caller_version": "v2.4",
+    "mode": "agent_mcp_version_desync",
+    "expected_keywords": ["v2.4", "client.query"],
+    "forbidden_keywords": ["client.search("],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_29",
+    "query": "Agent MCP integration test: Verify MCP check_symbol_exists adheres to v2.4 without defaulting to v3.",
+    "caller_version": "v2.4",
+    "mode": "agent_mcp_version_desync",
+    "expected_keywords": ["v2.4", "does not exist in v2.4"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  },
+  {
+    "id": "CASE_30",
+    "query": "Agent MCP integration test: Trace ID propagation across agent hop and MCP hop with span logging.",
+    "caller_version": "v3.0",
+    "mode": "agent_mcp_version_desync",
+    "expected_keywords": ["Client.search", "timeout", "v3.0"],
+    "forbidden_keywords": [],
+    "human_label": 1
+  }
+]
